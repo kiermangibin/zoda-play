@@ -2912,6 +2912,11 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .zoda-mission-final-cta__copy h2,
+  .zoda-mission-page--combined .zoda-mission-rewards__copy h2 {
+    max-width: none;
+  }
+
   .zoda-mission-final-cta {
     gap: 22px;
   }
