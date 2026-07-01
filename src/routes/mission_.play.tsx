@@ -300,7 +300,7 @@ function getPlayWinRules(scoreboard: ReturnType<typeof getScoreboard>, finalMiss
   ];
 }
 
-function MissionPlayPage() {
+export function MissionPlayPage({ embedded = false }: { embedded?: boolean } = {}) {
   const hasLoadedProgress = useRef(false);
   const [challengeResults, setChallengeResults] = useState<ChallengeResults>({});
   const [activeWeekIndex, setActiveWeekIndex] = useState(0);
@@ -549,9 +549,11 @@ function MissionPlayPage() {
     }
   };
 
-  return (
-    <div className="zoda-shell zoda-shell--light zoda-mission-play-page">
-      <main className="zoda-mission-play" aria-label="Mission play board">
+  const content = (
+      <main
+        className={embedded ? "zoda-mission-play zoda-mission-play--embedded" : "zoda-mission-play"}
+        aria-label="Mission play board"
+      >
         <section className="zoda-mission-play__header">
           <a className="zoda-mission-play__back" href="/mission">
             <ArrowLeft size={15} aria-hidden="true" />
@@ -960,6 +962,9 @@ function MissionPlayPage() {
           </aside>
         </section>
       </main>
-    </div>
   );
+
+  if (embedded) return content;
+
+  return <div className="zoda-shell zoda-shell--light zoda-mission-play-page">{content}</div>;
 }

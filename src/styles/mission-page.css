@@ -2675,3 +2675,157 @@
     text-align: left !important;
   }
 }
+
+/* Combined mission page: game, rewards, CTA. No snap-scroll. */
+.zoda-mission-page--combined {
+  background: var(--mission-bg);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.zoda-mission-page--combined .zoda-mission-play--embedded {
+  min-height: 100vh;
+  padding-top: 28px;
+}
+
+.zoda-mission-page--combined .zoda-mission-play--embedded .zoda-mission-play__back {
+  display: none;
+}
+
+.zoda-mission-combined {
+  background: var(--mission-bg);
+  display: grid;
+}
+
+.zoda-mission-page--combined .zoda-mission-section {
+  min-height: auto;
+  overflow: visible;
+  padding: clamp(56px, 7vw, 90px) 18px;
+}
+
+.zoda-mission-page--combined .zoda-mission-rewards {
+  align-items: center;
+  grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr);
+  justify-content: center;
+}
+
+.zoda-mission-page--combined .zoda-mission-rewards__pricing {
+  max-width: 920px;
+}
+
+.zoda-mission-final-cta {
+  align-items: center;
+  border-top: 1px solid var(--mission-line);
+  grid-template-columns: minmax(240px, 0.86fr) minmax(240px, 0.9fr);
+  justify-content: center;
+}
+
+.zoda-mission-final-cta__copy {
+  display: grid;
+  gap: 16px;
+  max-width: 560px;
+}
+
+.zoda-mission-final-cta__copy h2 {
+  font-family: var(--zoda-font-display, "Euphora", "Commuters Sans", Arial, sans-serif);
+  font-size: clamp(34px, 6vw, 76px);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 0.92;
+  margin: 0;
+  max-width: 10ch;
+  text-transform: uppercase;
+}
+
+.zoda-mission-final-cta__copy p {
+  color: var(--mission-muted);
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: clamp(13px, 1.6vw, 16px);
+  font-weight: 800;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 50ch;
+  text-transform: uppercase;
+}
+
+.zoda-mission-final-cta__button {
+  align-items: center;
+  background: var(--mission-orange);
+  border: 1.5px solid var(--mission-orange);
+  color: #fff;
+  display: inline-flex;
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 11px;
+  font-weight: 900;
+  gap: 10px;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  min-height: 46px;
+  padding: 14px 18px;
+  text-decoration: none;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.zoda-mission-final-cta__button:hover,
+.zoda-mission-final-cta__button:focus-visible {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #111;
+  outline: 0;
+}
+
+.zoda-mission-final-cta__image {
+  align-self: end;
+  display: grid;
+  justify-items: center;
+  max-width: min(520px, 100%);
+}
+
+.zoda-mission-final-cta__image img {
+  display: block;
+  filter: drop-shadow(0 28px 48px rgba(0, 0, 0, 0.48));
+  max-height: min(62vh, 620px);
+  max-width: 100%;
+  object-fit: contain;
+}
+
+@media (max-width: 980px) {
+  .zoda-mission-page--combined .zoda-mission-rewards,
+  .zoda-mission-final-cta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .zoda-mission-final-cta__copy {
+    justify-items: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .zoda-mission-page--combined .zoda-mission-play--embedded {
+    min-height: auto;
+    padding-top: 18px;
+  }
+
+  .zoda-mission-page--combined .zoda-mission-section {
+    padding: 42px 14px;
+  }
+
+  .zoda-mission-page--combined .zoda-mission-rewards {
+    gap: 18px;
+  }
+
+  .zoda-mission-final-cta {
+    gap: 22px;
+    min-height: 100vh;
+  }
+
+  .zoda-mission-final-cta__copy h2 {
+    font-size: clamp(34px, 14vw, 54px);
+  }
+
+  .zoda-mission-final-cta__button {
+    width: 100%;
+  }
+}
