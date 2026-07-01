@@ -1,11 +1,9 @@
 /* ============================================================
-   ZODA TOKENS — Single source of truth for the design system.
+   ZODA TOKENS - Single source of truth for this app.
 
-   All shared tokens, base elements, and reusable component
-   classes live here. DO NOT add per-route stylesheets — extend
-   this file or use Tailwind utilities. The same file is mirrored
-   into zoda-shopify-theme/assets/zoda-tokens.css so React and Liquid
-   share an identical visual baseline.
+   Shared tokens, base elements, and reusable component classes
+   live here so the mission React app can move as a standalone
+   project without depending on the Shopify theme repo.
    ============================================================ */
 
 :root {
