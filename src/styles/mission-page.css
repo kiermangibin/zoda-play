@@ -2932,8 +2932,8 @@
 @media (max-width: 760px) {
   .zoda-mission-combined {
     --mission-combined-heading: clamp(30px, 9vw, 42px);
-    --mission-combined-pad-y: 48px;
-    --mission-combined-pad-x: 14px;
+    --mission-combined-pad-y: 72px;
+    --mission-combined-pad-x: 18px;
   }
 
   .zoda-mission-page--combined .zoda-mission-play--embedded {
@@ -2942,8 +2942,13 @@
   }
 
   .zoda-mission-page--combined .zoda-mission-rewards {
-    gap: 18px;
+    gap: 28px;
     min-height: auto;
+  }
+
+  .zoda-mission-rewards__inner,
+  .zoda-mission-final-cta__inner {
+    gap: 28px;
   }
 
   .zoda-mission-final-cta__copy h2,
@@ -2952,7 +2957,7 @@
   }
 
   .zoda-mission-final-cta {
-    gap: 22px;
+    gap: 28px;
   }
 
   .zoda-mission-final-cta__button {
