@@ -122,16 +122,16 @@ function MissionPage() {
               <p className="zoda-mission-kicker">
                 <ShoppingBag size={15} aria-hidden="true" /> Final Mission
               </p>
-              <h2>Finish the board. Carry the mission.</h2>
+              <h2>Reserve the Mission Bag.</h2>
               <p>
-                Complete the 21-day path, record the Final Mission, and bring the same standard into
-                every session with the ZODA Mission Bag.
+                Join the prelaunch waitlist for the everything backpack built to carry your
+                training, travel, recovery, and daily mission.
               </p>
               <a
                 className="zoda-mission-final-cta__button"
                 href="https://prelaunch.com/projects/zoda-mission-zoda-mission-the-everything-backpack"
               >
-                View on Prelaunch
+                Reserve Your Spot
                 <ArrowRight size={16} aria-hidden="true" />
               </a>
             </div>
