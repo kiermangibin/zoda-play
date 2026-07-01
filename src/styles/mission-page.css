@@ -2715,7 +2715,6 @@
   grid-template-columns: minmax(260px, 430px) minmax(0, 960px);
   justify-content: center;
   justify-self: stretch;
-  min-height: 100vh;
   width: 100%;
 }
 
@@ -2761,7 +2760,6 @@
   grid-template-columns: minmax(240px, 520px) minmax(240px, 520px);
   justify-content: center;
   justify-self: stretch;
-  min-height: 100vh;
   width: 100%;
 }
 
@@ -2886,7 +2884,6 @@
 
   .zoda-mission-final-cta {
     gap: 22px;
-    min-height: 100vh;
   }
 
   .zoda-mission-final-cta__button {
