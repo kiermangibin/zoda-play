@@ -2932,7 +2932,7 @@
 @media (max-width: 760px) {
   .zoda-mission-combined {
     --mission-combined-heading: clamp(30px, 9vw, 42px);
-    --mission-combined-pad-y: 72px;
+    --mission-combined-pad-y: 56px;
     --mission-combined-pad-x: 18px;
   }
 
