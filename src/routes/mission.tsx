@@ -127,7 +127,10 @@ function MissionPage() {
                 Complete the 21-day path, record the Final Mission, and bring the same standard into
                 every session with the ZODA Mission Bag.
               </p>
-              <a className="zoda-mission-final-cta__button" href="/collections/accessories">
+              <a
+                className="zoda-mission-final-cta__button"
+                href="https://prelaunch.com/projects/zoda-mission-zoda-mission-the-everything-backpack"
+              >
                 Shop Mission Gear
                 <ArrowRight size={16} aria-hidden="true" />
               </a>
