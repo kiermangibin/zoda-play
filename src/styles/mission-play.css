@@ -95,7 +95,7 @@
 
 .zoda-mission-play__header h1 {
   font-family: var(--zoda-font-display, "Euphora", "Commuters Sans", Arial, sans-serif);
-  font-size: clamp(28px, 6vw, 52px);
+  font-size: clamp(40px, 6.4vw, 72px);
   font-weight: 800;
   letter-spacing: 0;
   line-height: 0.96;
