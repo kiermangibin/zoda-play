@@ -122,7 +122,7 @@
   display: grid;
   gap: 12px;
   justify-self: center;
-  width: min(100%, 1180px);
+  width: min(100%, 1360px);
 }
 
 .zoda-mission-play__mobile-status {
