@@ -2705,19 +2705,28 @@
 
 .zoda-mission-page--combined .zoda-mission-rewards {
   align-items: center;
+  align-content: center;
+  box-sizing: border-box;
   grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr);
   justify-content: center;
+  min-height: 100vh;
+  padding-bottom: clamp(72px, 8vw, 118px);
+  padding-top: clamp(72px, 8vw, 118px);
 }
 
 .zoda-mission-page--combined .zoda-mission-rewards__pricing {
-  max-width: 920px;
+  align-items: stretch;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 980px;
 }
 
 .zoda-mission-final-cta {
   align-items: center;
   border-top: 1px solid var(--mission-line);
+  box-sizing: border-box;
   grid-template-columns: minmax(240px, 0.86fr) minmax(240px, 0.9fr);
   justify-content: center;
+  min-height: 100vh;
 }
 
 .zoda-mission-final-cta__copy {
@@ -2814,6 +2823,11 @@
 
   .zoda-mission-page--combined .zoda-mission-rewards {
     gap: 18px;
+    min-height: auto;
+  }
+
+  .zoda-mission-page--combined .zoda-mission-rewards__pricing {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .zoda-mission-final-cta {
