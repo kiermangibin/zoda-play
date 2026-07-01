@@ -2773,10 +2773,33 @@
 }
 
 .zoda-mission-page--combined .zoda-mission-rewards__pricing {
-  align-items: stretch;
+  align-items: start;
   grid-template-columns: repeat(3, minmax(220px, 1fr));
   max-width: none;
   width: 100%;
+}
+
+.zoda-mission-page--combined .zoda-mission-reward-card {
+  align-content: start;
+  gap: 8px;
+  padding: 12px;
+}
+
+.zoda-mission-page--combined .zoda-mission-reward-card__head img {
+  height: 38px;
+  width: 46px;
+}
+
+.zoda-mission-page--combined .zoda-mission-reward-card p {
+  line-height: 1.22;
+}
+
+.zoda-mission-page--combined .zoda-mission-reward-card__points {
+  padding: 6px 0;
+}
+
+.zoda-mission-page--combined .zoda-mission-reward-card ul {
+  gap: 5px;
 }
 
 .zoda-mission-final-cta {
