@@ -131,7 +131,7 @@ function MissionPage() {
                 className="zoda-mission-final-cta__button"
                 href="https://prelaunch.com/projects/zoda-mission-zoda-mission-the-everything-backpack"
               >
-                Shop Mission Gear
+                View on Prelaunch
                 <ArrowRight size={16} aria-hidden="true" />
               </a>
             </div>
