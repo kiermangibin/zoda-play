@@ -2942,7 +2942,7 @@
   }
 
   .zoda-mission-page--combined .zoda-mission-rewards {
-    gap: 28px;
+    gap: 0;
     min-height: auto;
   }
 
