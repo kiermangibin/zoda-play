@@ -2733,6 +2733,20 @@
   align-self: start;
 }
 
+.zoda-mission-page--combined .zoda-mission-kicker {
+  align-items: center;
+  color: var(--mission-muted);
+  display: inline-flex;
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 13px;
+  font-weight: 900;
+  gap: 8px;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  margin: 0 0 14px;
+  text-transform: uppercase;
+}
+
 .zoda-mission-page--combined .zoda-mission-rewards__copy h2,
 .zoda-mission-final-cta__copy h2 {
   font-size: var(--mission-combined-heading);
