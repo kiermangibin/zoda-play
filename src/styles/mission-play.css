@@ -1,12 +1,16 @@
 /* Game-centered Mission route. */
 
-.zoda-mission-play-page {
+.zoda-mission-play-page,
+.zoda-mission-play {
   --mission-play-bg: #060705;
   --mission-play-card: #f8f5ea;
   --mission-play-paper: #d8c3a5;
   --mission-play-ink: #111;
   --mission-play-orange: #ff4b16;
   --mission-play-header-height: 72px;
+}
+
+.zoda-mission-play-page {
   background: var(--mission-play-bg);
   color: #f7f4ea;
   min-height: 100vh;
