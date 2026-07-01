@@ -1,0 +1,131 @@
+.zoda-shell,
+.zoda-shell--light {
+  --bg: #050505;
+  --fg: #ffffff;
+  --muted: rgba(255, 255, 255, 0.62);
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.22);
+  --accent: #55cda1;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--zoda-font-sans, "Commuters Sans", Arial, sans-serif);
+  min-height: 100vh;
+}
+
+.zoda-shell *,
+.zoda-shell--light * {
+  box-sizing: border-box;
+}
+
+.zoda-mission-fallback {
+  align-content: center;
+  background: #050505;
+  color: #fff;
+  display: grid;
+  font-family: var(--zoda-font-sans, "Commuters Sans", Arial, sans-serif);
+  gap: 16px;
+  justify-items: center;
+  min-height: 100vh;
+  padding: 24px;
+  text-align: center;
+}
+
+.zoda-mission-fallback h1 {
+  font-family: var(--zoda-font-display, "Euphora", "Commuters Sans", Arial, sans-serif);
+  font-size: 32px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.zoda-mission-fallback a {
+  background: var(--accent);
+  color: #050505;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 14px 18px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.zoda-circuit .zoda-circuit__dot:focus-visible {
+  outline: 2px solid var(--zoda-accent);
+  outline-offset: 4px;
+}
+
+.zoda-circuit .zoda-circuit__dots {
+  display: grid;
+  gap: 8px;
+}
+
+.zoda-circuit .zoda-circuit__dot {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  height: 26px;
+  justify-content: center;
+  padding: 0;
+  position: relative;
+  width: 26px;
+}
+
+.zoda-circuit .zoda-circuit__dot::before {
+  background: rgba(85, 205, 161, 0.34);
+  border: 1px solid rgba(85, 205, 161, 0.58);
+  border-radius: 999px;
+  content: "";
+  display: block;
+  height: 8px;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+  width: 8px;
+}
+
+.zoda-circuit .zoda-circuit__dot::after {
+  background: rgba(7, 9, 8, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+  content: attr(aria-label);
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  padding: 8px 10px;
+  pointer-events: none;
+  position: absolute;
+  right: 34px;
+  text-transform: uppercase;
+  top: 50%;
+  transform: translate3d(8px, -50%, 0);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+  white-space: nowrap;
+}
+
+.zoda-circuit .zoda-circuit__dot.is-active {
+  background: transparent;
+}
+
+.zoda-circuit .zoda-circuit__dot.is-active::before,
+.zoda-circuit .zoda-circuit__dot:hover::before,
+.zoda-circuit .zoda-circuit__dot:focus-visible::before {
+  background: var(--zoda-accent);
+  border-color: var(--zoda-accent);
+  box-shadow: 0 0 0 6px rgba(85, 205, 161, 0.14);
+  transform: scale(1.18);
+}
+
+.zoda-circuit .zoda-circuit__dot:hover::after,
+.zoda-circuit .zoda-circuit__dot:focus-visible::after {
+  opacity: 1;
+  transform: translate3d(0, -50%, 0);
+}

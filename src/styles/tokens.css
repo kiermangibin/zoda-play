@@ -1,0 +1,170 @@
+/* ============================================================
+   ZODA TOKENS — Single source of truth for the design system.
+
+   All shared tokens, base elements, and reusable component
+   classes live here. DO NOT add per-route stylesheets — extend
+   this file or use Tailwind utilities. The same file is mirrored
+   into zoda-shopify-theme/assets/zoda-tokens.css so React and Liquid
+   share an identical visual baseline.
+   ============================================================ */
+
+:root {
+  /* Palette */
+  --zoda-bg: #050505;
+  --zoda-fg: #ffffff;
+  --zoda-muted: rgba(255, 255, 255, 0.62);
+  --zoda-line: rgba(255, 255, 255, 0.1);
+  --zoda-line-strong: rgba(255, 255, 255, 0.22);
+  --zoda-accent: #55cda1;
+  --zoda-accent-ink: #000000;
+
+  /* Typography */
+  --zoda-font-sans: "Commuters Sans", Arial, sans-serif;
+  --zoda-font-display: "Euphora", "Commuters Sans", Arial, sans-serif;
+  --zoda-font-mono: "Commuters Sans", Arial, sans-serif;
+
+  /* Aliases used by older site-light.css selectors */
+  --bg: var(--zoda-bg);
+  --fg: var(--zoda-fg);
+  --muted: var(--zoda-muted);
+  --line: var(--zoda-line);
+  --line-strong: var(--zoda-line-strong);
+  --accent: var(--zoda-accent);
+}
+
+/* Base elements — any new component already looks on-brand. */
+html,
+body {
+  background: var(--zoda-bg);
+  color: var(--zoda-fg);
+  font-family: var(--zoda-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+body {
+  margin: 0;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ---------- Reusable utility classes ---------- */
+
+.zoda-shell {
+  background: var(--zoda-bg);
+  color: var(--zoda-fg);
+  min-height: 100vh;
+  font-family: var(--zoda-font-sans);
+}
+
+.zoda-section {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(32px, 6vw, 80px) clamp(20px, 4vw, 56px);
+}
+
+.zoda-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--zoda-accent);
+}
+
+.zoda-heading {
+  font-family: var(--zoda-font-display);
+  font-size: clamp(28px, 4vw, 56px);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  line-height: 1.05;
+  color: var(--zoda-fg);
+  margin: 0;
+}
+
+.zoda-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--zoda-accent);
+  color: var(--zoda-accent-ink);
+  border: 0;
+  padding: 14px 22px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  cursor: pointer;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: center;
+  white-space: normal;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+.zoda-button:hover {
+  background: #ffffff;
+  color: #000;
+}
+.zoda-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.zoda-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--zoda-fg);
+  border: 1px solid var(--zoda-line-strong);
+  padding: 14px 22px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  cursor: pointer;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: center;
+  white-space: normal;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease;
+}
+.zoda-button-secondary:hover {
+  border-color: var(--zoda-accent);
+  color: var(--zoda-accent);
+}
+
+@media (max-width: 760px) {
+  .zoda-button,
+  .zoda-button-secondary {
+    min-width: 0;
+    padding-inline: clamp(10px, 3vw, 18px);
+  }
+}
+
+.zoda-card {
+  background: rgba(7, 9, 8, 0.58);
+  border: 1px solid var(--zoda-line);
+  color: var(--zoda-fg);
+  transition:
+    border-color 220ms ease,
+    transform 220ms ease;
+}
+.zoda-card:hover {
+  border-color: var(--zoda-accent);
+  transform: translateY(-3px);
+}

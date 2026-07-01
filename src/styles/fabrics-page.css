@@ -1,0 +1,1505 @@
+﻿/* Fabrics page styles extracted from site-light.css. */
+
+/* ============================================================
+   FABRICS PAGE — snap-scroll, mirrors zoda.sg layout
+   ============================================================ */
+.zoda-fabrics-page {
+  height: 100vh;
+  height: 100svh;
+  width: 100vw;
+  max-width: 100vw;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+  background: #0a0a0a;
+}
+
+.zoda-fabrics-page,
+.zoda-fabrics-page *,
+.zoda-fabrics-page *::before,
+.zoda-fabrics-page *::after {
+  box-sizing: border-box;
+} /* Fabrics page header overlays the snap content — no flow height,
+   so it never pushes the snap container below the viewport (mobile fix). */
+.zoda-fabrics-page > .zoda-circuit.zoda-circuit--chrome-only,
+.zoda-fabrics-page .zoda-site-header,
+.zoda-fabrics-page .zoda-shell__site-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  transition:
+    opacity 180ms ease,
+    transform 220ms ease;
+}
+.zoda-fabrics-page .zoda-site-header,
+.zoda-fabrics-page .zoda-shell__site-header {
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(10px);
+}
+@media (min-width: 761px) {
+  .zoda-fabrics-page[data-snap-active-panel]:not([data-snap-active-panel="1"])
+    > .zoda-circuit.zoda-circuit--chrome-only,
+  .zoda-fabrics-page[data-snap-active-panel]:not([data-snap-active-panel="1"]) .zoda-site-header,
+  .zoda-fabrics-page[data-snap-active-panel]:not([data-snap-active-panel="1"])
+    .zoda-shell__site-header {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-100%);
+  }
+  .zoda-fabrics-page[data-snap-active-panel="1"] > .zoda-circuit.zoda-circuit--chrome-only,
+  .zoda-fabrics-page[data-snap-active-panel="1"] .zoda-site-header,
+  .zoda-fabrics-page[data-snap-active-panel="1"] .zoda-shell__site-header,
+  .zoda-fabrics-page:not([data-snap-active-panel]) > .zoda-circuit.zoda-circuit--chrome-only,
+  .zoda-fabrics-page:not([data-snap-active-panel]) .zoda-site-header,
+  .zoda-fabrics-page:not([data-snap-active-panel]) .zoda-shell__site-header {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 760px) {
+  .zoda-fabrics-page > .zoda-circuit.zoda-circuit--chrome-only,
+  .zoda-fabrics-page .zoda-site-header,
+  .zoda-fabrics-page .zoda-shell__site-header {
+    opacity: 1;
+    pointer-events: auto;
+    position: fixed;
+    transform: none;
+  }
+}
+.zoda-fabrics-snap {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.zoda-fabrics-snap::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+.zoda-fabrics-snap__section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  height: 100vh;
+  height: 100svh;
+  width: 100vw;
+  max-width: 100vw;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+.zoda-fabrics-snap__footer {
+  align-items: center;
+  background: #050505;
+  display: flex;
+  overflow-y: auto;
+}
+.zoda-fabrics-snap__footer .zoda-footer {
+  width: 100%;
+} /* Hero */
+.zoda-fabrics-hero {
+  overflow: hidden;
+}
+.zoda-fabrics-hero__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.zoda-fabrics-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(0, 0, 0, 0.55) 60%,
+    rgba(85, 205, 161, 0.85) 100%
+  );
+}
+.zoda-fabrics-hero__content {
+  position: relative;
+  margin: auto;
+  max-width: 980px;
+  padding: 120px 24px 80px;
+  text-align: center;
+  color: #fff;
+}
+.zoda-fabrics-hero__kicker {
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  margin: 0 0 20px;
+  opacity: 0.9;
+}
+.zoda-fabrics-hero__title {
+  font-family: var(--zoda-font-display, "Euphora", "Commuters Sans", Arial, sans-serif);
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.05;
+  margin: 0 0 24px;
+}
+.zoda-fabrics-hero__lede {
+  font-size: clamp(15px, 1.6vw, 20px);
+  line-height: 1.6;
+  max-width: 640px;
+  margin: 0 auto;
+  opacity: 0.95;
+} /* Directory grid */
+.zoda-fabrics-directory {
+  --zoda-directory-rows: 4;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: clamp(82px, 12vh, 120px) clamp(12px, 3vw, 32px) clamp(20px, 4vh, 40px);
+  background: #0a0a0a;
+  color: #fff;
+  overflow: hidden;
+}
+.zoda-fabrics-directory__head {
+  text-align: center;
+  margin-bottom: clamp(14px, 2vh, 24px);
+}
+.zoda-fabrics-directory__kicker {
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+.zoda-fabrics-directory__title {
+  font-family: var(--zoda-font-display, "Euphora", "Commuters Sans", Arial, sans-serif);
+  font-size: clamp(22px, 2.6vw, 34px);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0;
+}
+.zoda-fabrics-directory__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(var(--zoda-directory-rows), minmax(0, 1fr));
+  gap: 8px;
+  max-width: 1400px;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  flex: 1 1 auto;
+  max-height: 100%;
+  min-height: 0;
+  align-content: stretch;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.zoda-fabrics-directory__grid::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+.zoda-fabrics-directory__mobile-ui {
+  display: none;
+}
+@media (min-width: 480px) {
+  .zoda-fabrics-directory__grid {
+    gap: 10px;
+  }
+}
+@media (min-width: 720px) {
+  .zoda-fabrics-directory {
+    --zoda-directory-rows: 3;
+  }
+  .zoda-fabrics-directory__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}
+@media (min-width: 1024px) {
+  .zoda-fabrics-directory {
+    --zoda-directory-rows: 2;
+  }
+  .zoda-fabrics-directory__grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+}
+.zoda-fabrics-directory__grid .zoda-fabrics-card {
+  aspect-ratio: auto;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+@media (min-width: 720px) {
+  .zoda-fabrics-directory__grid .zoda-fabrics-card {
+    aspect-ratio: auto;
+  }
+}
+@media (min-width: 1024px) {
+  .zoda-fabrics-directory__grid .zoda-fabrics-card {
+    aspect-ratio: auto;
+  }
+}
+
+.zoda-fabrics-card {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  text-decoration: none;
+  color: #fff;
+  display: block;
+}
+.zoda-fabrics-card__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 600ms ease;
+}
+.zoda-fabrics-card:hover .zoda-fabrics-card__img {
+  transform: scale(1.05);
+}
+.zoda-fabrics-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.7) 100%);
+}
+.zoda-fabrics-card__body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 6px;
+}
+.zoda-fabrics-card__name {
+  font-family: var(--zoda-font-display, "Euphora", "Commuters Sans", Arial, sans-serif);
+  font-size: clamp(18px, 1.8vw, 26px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+}
+.zoda-fabrics-card__cta {
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+} /* Craft accordion */
+.zoda-fabrics-craft {
+  align-items: center;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(85, 205, 161, 0.14), transparent 28%),
+    linear-gradient(135deg, #050606, #0a0a0a 58%, #050606);
+  color: #fff;
+  gap: clamp(28px, 6vw, 96px);
+  padding: clamp(92px, 12vh, 130px) clamp(20px, 5vw, 78px) clamp(28px, 6vh, 72px);
+}
+.zoda-fabrics-craft__intro {
+  flex: 0 1 520px;
+  min-width: 0;
+}
+.zoda-fabrics-craft__title {
+  font-family: var(--zoda-font-display, "Euphora", "Commuters Sans", Arial, sans-serif);
+  font-size: clamp(34px, 4.8vw, 72px);
+  font-weight: 700;
+  line-height: 1;
+  margin: 0;
+  max-width: 12ch;
+  text-transform: uppercase;
+}
+.zoda-fabrics-craft__copy {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(14px, 1.2vw, 18px);
+  line-height: 1.65;
+  margin: 22px 0 0;
+  max-width: 36ch;
+}
+.zoda-fabrics-craft__accordion {
+  flex: 1 1 620px;
+  max-width: 760px;
+  min-width: 0;
+  width: 100%;
+}
+.zoda-fabrics-craft__item {
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.zoda-fabrics-craft__item:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+.zoda-fabrics-craft__trigger {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  gap: clamp(14px, 2vw, 24px);
+  grid-template-columns: 42px minmax(0, 1fr) 34px;
+  list-style: none;
+  padding: clamp(14px, 2vh, 22px) 0;
+  text-align: left;
+  width: 100%;
+}
+.zoda-fabrics-craft__trigger::-webkit-details-marker {
+  display: none;
+}
+.zoda-fabrics-craft__trigger::after {
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--accent);
+  content: "+";
+  display: inline-flex;
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 18px;
+  font-weight: 700;
+  height: 34px;
+  justify-content: center;
+  line-height: 1;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 220ms ease;
+  width: 34px;
+}
+.zoda-fabrics-craft__item.is-open .zoda-fabrics-craft__trigger::after,
+.zoda-fabrics-craft__item[open] .zoda-fabrics-craft__trigger::after {
+  background: var(--accent);
+  color: #000;
+  content: "-";
+}
+.zoda-fabrics-craft__trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.zoda-fabrics-craft__trigger span {
+  color: var(--accent);
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+.zoda-fabrics-craft__trigger strong {
+  font-family: var(--zoda-font-display, "Euphora", "Commuters Sans", Arial, sans-serif);
+  font-size: clamp(22px, 2.4vw, 36px);
+  font-weight: 700;
+  line-height: 1.04;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+.zoda-fabrics-craft__panel {
+  display: none;
+  padding-left: calc(42px + clamp(14px, 2vw, 24px));
+}
+.zoda-fabrics-craft__item.is-open .zoda-fabrics-craft__panel,
+.zoda-fabrics-craft__item[open] .zoda-fabrics-craft__panel {
+  display: block;
+}
+.zoda-fabrics-craft__panel p {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(13px, 1.1vw, 16px);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 56ch;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 0 clamp(14px, 2vh, 24px);
+} /* Feature (one per fabric) */
+.zoda-fabrics-feature {
+  flex-direction: column;
+  background: #0a0a0a;
+  color: #fff;
+  min-height: 0;
+}
+@media (min-width: 960px) {
+  .zoda-fabrics-feature {
+    flex-direction: row;
+  }
+  .zoda-fabrics-feature[data-orientation="right"] {
+    flex-direction: row-reverse;
+  }
+  .zoda-fabrics-feature > .zoda-fabrics-feature__media,
+  .zoda-fabrics-feature > .zoda-fabrics-feature__body {
+    flex: 0 0 50%;
+    max-width: 50%;
+    width: 50%;
+  }
+}
+.zoda-fabrics-feature__media {
+  position: relative;
+  flex: 1 1 50%;
+  min-height: 40vh;
+  overflow: hidden;
+  min-width: 0;
+}
+.zoda-fabrics-feature__media img,
+.zoda-fabrics-feature__media video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.zoda-fabrics-feature__body {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(72px, 8vh, 96px) clamp(24px, 5vw, 72px) clamp(24px, 4vh, 48px);
+  max-width: 720px;
+  min-height: 0;
+  min-width: 0;
+  overflow: visible;
+}
+.zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__body {
+  gap: 20px;
+}
+.zoda-fabrics-feature__eyebrow {
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 10px;
+}
+.zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__eyebrow,
+.zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__title,
+.zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__desc,
+.zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__features,
+.zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__accordion {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.zoda-fabrics-feature__title {
+  font-family: var(--zoda-font-display, "Euphora", "Commuters Sans", Arial, sans-serif);
+  font-size: clamp(24px, 3vw, 38px) !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+  margin: 0 0 14px;
+  overflow-wrap: anywhere;
+}
+.zoda-fabrics-feature__desc {
+  font-size: clamp(14px, 1.08vw, 15px);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0 0 18px;
+  max-width: 58ch;
+}
+.zoda-fabrics-feature__features {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+}
+.zoda-fabrics-feature__features li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  min-width: 76px;
+  text-align: center;
+}
+.zoda-fabrics-feature__features img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  opacity: 1;
+}
+.zoda-fabrics-feature__features span {
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+}
+.zoda-fabrics-feature__accordion {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.024)),
+    rgba(7, 9, 8, 0.54);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 24px 72px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: grid;
+  margin: 0 0 18px;
+  max-width: 640px;
+  min-width: 0;
+  overflow: hidden;
+  width: min(100%, 640px);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
+}
+.zoda-fabrics-feature__accordion-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.zoda-fabrics-feature__accordion-item:first-child {
+  border-top: 0;
+}
+.zoda-fabrics-feature__accordion-trigger {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  gap: 8px 12px;
+  grid-template-columns: 30px minmax(0, 1fr) max-content 24px;
+  list-style: none;
+  min-height: 62px;
+  padding: 0 clamp(16px, 2vw, 24px);
+  text-align: left;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+  width: 100%;
+}
+.zoda-fabrics-feature__accordion-trigger::-webkit-details-marker {
+  display: none;
+}
+.zoda-fabrics-feature__accordion-trigger:hover {
+  background: rgba(255, 255, 255, 0.055);
+}
+.zoda-fabrics-feature__accordion-trigger:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--accent, #55cda1);
+  outline: 0;
+}
+.zoda-fabrics-feature__accordion-index,
+.zoda-fabrics-feature__accordion-label {
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.zoda-fabrics-feature__accordion-index {
+  color: var(--accent);
+}
+.zoda-fabrics-feature__accordion-label {
+  color: rgba(255, 255, 255, 0.54);
+  justify-self: end;
+}
+.zoda-fabrics-feature__accordion-trigger strong {
+  font-family: var(--zoda-font-display, "Euphora", "Commuters Sans", Arial, sans-serif);
+  font-size: clamp(15px, 1.25vw, 19px);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+.zoda-fabrics-feature__accordion-trigger i {
+  border: 1px solid rgba(85, 205, 161, 0.62);
+  display: block;
+  height: 22px;
+  position: relative;
+  width: 22px;
+}
+.zoda-fabrics-feature__accordion-trigger i::before,
+.zoda-fabrics-feature__accordion-trigger i::after {
+  background: var(--accent);
+  content: "";
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+.zoda-fabrics-feature__accordion-trigger i::before {
+  height: 2px;
+  width: 10px;
+}
+.zoda-fabrics-feature__accordion-trigger i::after {
+  height: 10px;
+  width: 2px;
+}
+.zoda-fabrics-feature__accordion-item[open] .zoda-fabrics-feature__accordion-trigger,
+.zoda-fabrics-feature__accordion-item.is-open .zoda-fabrics-feature__accordion-trigger {
+  background: #000;
+}
+.zoda-fabrics-feature__accordion-item[open] .zoda-fabrics-feature__accordion-trigger i,
+.zoda-fabrics-feature__accordion-item.is-open .zoda-fabrics-feature__accordion-trigger i {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.zoda-fabrics-feature__accordion-item[open] .zoda-fabrics-feature__accordion-trigger i::before,
+.zoda-fabrics-feature__accordion-item[open] .zoda-fabrics-feature__accordion-trigger i::after,
+.zoda-fabrics-feature__accordion-item.is-open .zoda-fabrics-feature__accordion-trigger i::before,
+.zoda-fabrics-feature__accordion-item.is-open .zoda-fabrics-feature__accordion-trigger i::after {
+  background: #000;
+}
+.zoda-fabrics-feature__accordion-item[open] .zoda-fabrics-feature__accordion-trigger i::after,
+.zoda-fabrics-feature__accordion-item.is-open .zoda-fabrics-feature__accordion-trigger i::after {
+  transform: translate(-50%, -50%) scaleY(0);
+}
+.zoda-fabrics-feature__accordion-panel {
+  background:
+    linear-gradient(90deg, rgba(85, 205, 161, 0.12), rgba(85, 205, 161, 0)), rgba(0, 0, 0, 0.18);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 14px 12px 44px;
+}
+.zoda-fabrics-feature__accordion-panel p,
+.zoda-fabrics-feature__accordion-list {
+  margin: 0;
+  padding: 0;
+  font-family: var(--zoda-font-sans, "Commuters Sans", Arial, sans-serif);
+  font-size: clamp(12px, 1vw, 13px);
+  line-height: 1.42;
+  color: rgba(255, 255, 255, 0.76);
+}
+.zoda-fabrics-feature__accordion-list {
+  list-style: none;
+}
+.zoda-fabrics-feature__accordion-list li {
+  position: relative;
+  padding-left: 14px;
+}
+.zoda-fabrics-feature__accordion-list li + li {
+  margin-top: 4px;
+}
+.zoda-fabrics-feature__accordion-list li::before {
+  content: "";
+  position: absolute;
+  top: 0.58em;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 0;
+  background: var(--accent);
+}
+.zoda-fabrics-feature__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+.zoda-fabrics-feature__shop {
+  background: var(--accent);
+  color: #000;
+  padding: 14px 22px;
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  transition: background 180ms ease;
+}
+.zoda-fabrics-feature__shop:hover {
+  background: #fff;
+}
+.zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__shop,
+.zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__back {
+  display: inline-flex;
+  height: 40px;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0 22px;
+  line-height: 1;
+}
+.zoda-fabrics-feature__back {
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+}
+.zoda-fabrics-feature__back:hover {
+  color: var(--accent);
+}
+.zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__back {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.06));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 14px 34px rgba(0, 0, 0, 0.22);
+  color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px) saturate(145%);
+  -webkit-backdrop-filter: blur(16px) saturate(145%);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+.zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__back:hover {
+  border-color: rgba(85, 205, 161, 0.62);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.24), rgba(85, 205, 161, 0.14));
+  color: #fff;
+  transform: translateY(-1px);
+}
+.zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__back:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__shop,
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__back {
+    flex: 0 1 auto;
+    padding-inline: 14px;
+  }
+}
+
+@media (min-width: 761px) and (max-height: 860px) {
+  .zoda-fabrics-feature__body {
+    gap: 20px;
+    padding: 72px clamp(22px, 4vw, 54px) clamp(18px, 3vh, 30px);
+  }
+  .zoda-fabrics-feature__eyebrow {
+    font-size: 10px;
+    margin-bottom: 7px;
+  }
+  .zoda-fabrics-feature__title {
+    font-size: clamp(22px, 2.55vw, 32px);
+    margin-bottom: 10px;
+    max-width: 90%;
+  }
+  .zoda-fabrics-feature__desc {
+    font-size: 13px;
+    line-height: 1.38;
+    margin-bottom: 12px;
+    max-width: 54ch;
+  }
+  .zoda-fabrics-feature__features {
+    gap: 8px 12px;
+    margin-bottom: 12px;
+  }
+  .zoda-fabrics-feature__features li {
+    gap: 4px;
+    min-width: 62px;
+  }
+  .zoda-fabrics-feature__features img {
+    height: 40px;
+    width: 40px;
+    margin-bottom: 5px;
+  }
+  .zoda-fabrics-feature__features span {
+    font-size: 9px;
+  }
+  .zoda-fabrics-feature__accordion {
+    margin-bottom: 12px;
+    max-width: 580px;
+  }
+  .zoda-fabrics-feature__accordion-trigger {
+    grid-template-columns: 26px minmax(0, 1fr) max-content 22px;
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+  .zoda-fabrics-feature__accordion-index,
+  .zoda-fabrics-feature__accordion-label {
+    font-size: 9px;
+  }
+  .zoda-fabrics-feature__accordion-trigger strong {
+    font-size: clamp(14px, 1.1vw, 17px);
+  }
+  .zoda-fabrics-feature__accordion-panel {
+    padding: 8px 12px 10px 38px;
+  }
+  .zoda-fabrics-feature__accordion-panel p,
+  .zoda-fabrics-feature__accordion-list {
+    font-size: 11.5px;
+    line-height: 1.34;
+  }
+  .zoda-fabrics-feature__actions {
+    gap: 10px;
+  }
+  .zoda-fabrics-feature__shop {
+    padding: 10px 16px;
+  }
+}
+
+@media (min-width: 761px) and (max-height: 720px) {
+  .zoda-fabrics-feature__body {
+    padding-top: 68px;
+  }
+  .zoda-fabrics-feature__title {
+    font-size: clamp(20px, 2.25vw, 28px);
+  }
+  .zoda-fabrics-feature__desc {
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    overflow: hidden;
+  }
+}
+
+/* Snap dots on Fabrics page — reuse homepage .zoda-circuit__dot styling
+   without inheriting the full circuit shell (height/background). */
+.zoda-fabrics-dots-host.zoda-circuit {
+  background: transparent;
+  color: inherit;
+  height: auto;
+  overflow: visible;
+  position: static;
+  isolation: auto;
+  font-family: inherit;
+}
+.zoda-fabrics-dots-host .zoda-circuit__dots {
+  position: fixed;
+  right: clamp(14px, 2vw, 32px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+}
+.zoda-fabrics-dots-host .zoda-circuit__dot {
+  cursor: pointer;
+} /* Hover tagline on directory cards */
+.zoda-fabrics-card__hover {
+  position: absolute;
+  inset: 0;
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.72);
+  color: rgba(255, 255, 255, 0.95);
+  font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+.zoda-fabrics-card:hover .zoda-fabrics-card__hover,
+.zoda-fabrics-card:focus-visible .zoda-fabrics-card__hover,
+.zoda-fabrics-card.is-revealed .zoda-fabrics-card__hover {
+  opacity: 1;
+}
+.zoda-fabrics-card:hover .zoda-fabrics-card__body,
+.zoda-fabrics-card:focus-visible .zoda-fabrics-card__body,
+.zoda-fabrics-card.is-revealed .zoda-fabrics-card__body {
+  opacity: 0;
+  transition: opacity 180ms ease;
+} /* ============================================================
+   FABRICS — mobile responsive (matches homepage mobile snap)
+   ============================================================ */
+@media (max-width: 760px) {
+  /* Hide vertical dots on mobile to free up width (homepage does too) */
+  .zoda-fabrics-dots-host .zoda-circuit__dots {
+    display: none;
+  } /* Hero tightening */
+  .zoda-fabrics-hero__content {
+    padding: 88px 20px 40px;
+  }
+  .zoda-fabrics-hero__title {
+    font-size: clamp(28px, 8vw, 44px);
+    margin-bottom: 16px;
+  }
+  .zoda-fabrics-hero__lede {
+    font-size: 14px;
+    line-height: 1.55;
+  } /* Directory: keep the full set visible within one snap panel */
+  .zoda-fabrics-directory {
+    --zoda-directory-rows: 4;
+    justify-content: flex-start;
+    width: 100vw;
+    max-width: 100vw;
+    padding: 82px 0 18px;
+  }
+  .zoda-fabrics-directory__head {
+    margin-bottom: 10px;
+    padding: 0 16px;
+  }
+  .zoda-fabrics-directory__title {
+    font-size: clamp(18px, 5.5vw, 24px);
+  }
+  .zoda-fabrics-directory__kicker {
+    font-size: 13px !important;
+    margin-bottom: 6px;
+  }
+  .zoda-fabrics-directory__grid {
+    gap: 6px;
+    padding: 0 8px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(var(--zoda-directory-rows), minmax(0, 1fr));
+    align-content: stretch;
+  }
+  .zoda-fabrics-directory__grid .zoda-fabrics-card {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+  .zoda-fabrics-card__body {
+    padding: 8px 10px;
+  }
+  .zoda-fabrics-card__name {
+    font-size: clamp(13px, 4vw, 16px);
+    overflow-wrap: anywhere;
+  }
+  .zoda-fabrics-card__cta {
+    font-size: 9px;
+  }
+  .zoda-fabrics-card__face--back {
+    padding: 10px;
+    gap: 6px;
+  }
+  .zoda-fabrics-card__back-eyebrow {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+  .zoda-fabrics-card__back-text {
+    font-size: 10px;
+    line-height: 1.35;
+    -webkit-line-clamp: 4;
+  }
+  .zoda-fabrics-card__back-cta {
+    font-size: 9px;
+  }
+  .zoda-fabrics-card__hover {
+    padding: 10px 12px;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .zoda-fabrics-craft {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 20px;
+    padding: 86px 20px 22px;
+  }
+  .zoda-fabrics-craft__intro,
+  .zoda-fabrics-craft__accordion {
+    flex: 0 1 auto;
+    max-width: none;
+  }
+  .zoda-fabrics-craft__title {
+    font-size: clamp(28px, 8vw, 42px);
+    max-width: 11ch;
+  }
+  .zoda-fabrics-craft__copy {
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 12px;
+    max-width: 30ch;
+  }
+  .zoda-fabrics-craft__trigger {
+    grid-template-columns: 32px minmax(0, 1fr) 30px;
+    padding: 11px 0;
+  }
+  .zoda-fabrics-craft__trigger::after {
+    height: 30px;
+    width: 30px;
+  }
+  .zoda-fabrics-craft__trigger strong {
+    font-size: clamp(17px, 5vw, 22px);
+  }
+  .zoda-fabrics-craft__panel {
+    padding-left: 46px;
+  }
+  .zoda-fabrics-craft__panel p {
+    font-size: 12px;
+    line-height: 1.45;
+    max-width: 31ch;
+    padding-bottom: 12px;
+  } /* Feature panels: stack with cap on media so body content fits inside 100svh */
+  .zoda-fabrics-feature {
+    flex-direction: column;
+    padding-top: 72px;
+  }
+  .zoda-fabrics-feature__media {
+    width: 100vw;
+    max-width: 100vw;
+    flex: 0 0 clamp(150px, 15svh, 240px);
+    min-height: 0;
+    height: auto;
+  }
+  .zoda-fabrics-feature__body {
+    width: 100vw;
+    max-width: 100vw;
+    flex: 1 1 auto;
+    padding: 12px 18px 16px;
+    max-width: none;
+    overflow: visible;
+    min-height: 0;
+    justify-content: flex-start;
+  }
+  .zoda-fabrics-feature__eyebrow {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .zoda-fabrics-feature__title {
+    font-size: clamp(19px, 5vw, 25px) !important;
+    margin-bottom: 8px;
+    max-width: 100%;
+  }
+  .zoda-fabrics-feature__desc {
+    font-size: 13px;
+    line-height: 1.38;
+    margin-bottom: 10px;
+    max-width: min(100%, 38ch);
+    overflow-wrap: anywhere;
+  }
+  .zoda-fabrics-feature__features {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    margin-bottom: 10px;
+    max-width: min(100%, 330px);
+  }
+  .zoda-fabrics-feature__features li {
+    width: auto;
+    min-width: 0;
+    gap: 4px;
+  }
+  .zoda-fabrics-feature__features img {
+    width: 35px;
+    height: 35px;
+  }
+  .zoda-fabrics-feature__features span {
+    font-size: 9px;
+    letter-spacing: 0.04em;
+  }
+  .zoda-fabrics-feature__accordion {
+    margin-bottom: 10px;
+    max-width: min(100%, 360px);
+  }
+  .zoda-fabrics-feature__accordion-trigger {
+    gap: 6px 8px;
+    grid-template-columns: 24px minmax(0, 1fr) 20px;
+    min-height: 30px;
+    padding: 8px 10px;
+  }
+  .zoda-fabrics-feature__accordion-label {
+    display: none;
+  }
+  .zoda-fabrics-feature__accordion-index {
+    font-size: 9px;
+  }
+  .zoda-fabrics-feature__accordion-trigger strong {
+    font-size: clamp(13px, 3.45vw, 15px);
+    line-height: 1.05;
+  }
+  .zoda-fabrics-feature__accordion-trigger i {
+    height: 20px;
+    width: 20px;
+  }
+  .zoda-fabrics-feature__accordion-panel {
+    padding: 8px 10px 9px 20px;
+  }
+  .zoda-fabrics-feature__accordion-panel p,
+  .zoda-fabrics-feature__accordion-list {
+    font-size: 11.5px;
+    line-height: 1.34;
+  }
+  .zoda-fabrics-feature__accordion-list li + li {
+    margin-top: 5px;
+  }
+  .zoda-fabrics-feature__actions {
+    gap: 10px;
+    flex-wrap: wrap;
+    max-width: 100%;
+    width: fit-content;
+  }
+  .zoda-fabrics-feature__shop {
+    padding: 10px 16px;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  .zoda-fabrics-feature__back {
+    font-size: 11px;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  } /* Hero needs to clear the absolutely-positioned header */
+  .zoda-fabrics-hero__content {
+    padding-top: 96px;
+  }
+}
+
+@media (max-width: 760px) and (orientation: landscape), (max-width: 760px) and (max-height: 540px) {
+  .zoda-fabrics-directory {
+    --zoda-directory-rows: 2;
+    padding-top: 64px;
+    padding-bottom: 10px;
+  }
+  .zoda-fabrics-directory__head {
+    margin-bottom: 6px;
+  }
+  .zoda-fabrics-directory__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+  }
+  .zoda-fabrics-card__body {
+    padding: 6px 7px;
+  }
+  .zoda-fabrics-card__name {
+    font-size: clamp(11px, 2.8vw, 14px);
+  }
+  .zoda-fabrics-card__cta,
+  .zoda-fabrics-card__back-cta {
+    display: none;
+  }
+  .zoda-fabrics-card__face--back {
+    padding: 8px;
+  }
+  .zoda-fabrics-card__back-text {
+    -webkit-line-clamp: 3;
+  }
+  .zoda-fabrics-craft {
+    display: grid;
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+    gap: 20px;
+    padding: 66px 18px 14px;
+  }
+  .zoda-fabrics-craft__title {
+    font-size: clamp(22px, 5vw, 34px);
+  }
+  .zoda-fabrics-craft__copy {
+    font-size: 12px;
+  }
+  .zoda-fabrics-craft__trigger {
+    padding: 8px 0;
+  }
+  .zoda-fabrics-craft__trigger::after {
+    height: 28px;
+    width: 28px;
+  }
+  .zoda-fabrics-craft__trigger strong {
+    font-size: clamp(15px, 3vw, 19px);
+  }
+  .zoda-fabrics-craft__panel p {
+    font-size: 11px;
+    line-height: 1.35;
+    padding-bottom: 8px;
+  }
+}
+
+@media (max-width: 500px) {
+  .zoda-fabrics-directory {
+    --zoda-directory-rows: 1;
+    align-content: center;
+    justify-content: center;
+    padding-top: 76px;
+    padding-bottom: 18px;
+  }
+  .zoda-fabrics-directory__head {
+    margin-bottom: 12px;
+    padding: 0 18px;
+  }
+  .zoda-fabrics-directory__grid {
+    align-content: stretch;
+    flex: 0 0 auto;
+    display: flex;
+    gap: 12px;
+    grid-template-columns: none;
+    grid-template-rows: none;
+    height: min(42svh, 260px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0px 20px;
+    scroll-padding-left: max(16px, calc((100vw - min(74vw, 260px)) / 2));
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .zoda-fabrics-directory__grid .zoda-fabrics-card {
+    flex: 0 0 min(74vw, 260px);
+    height: 100%;
+    min-height: 0;
+    scroll-snap-align: center;
+  }
+  .zoda-fabrics-card__body {
+    align-items: flex-end;
+    padding: 10px;
+  }
+  .zoda-fabrics-card__name {
+    font-size: clamp(17px, 5.6vw, 22px);
+  }
+  .zoda-fabrics-card__cta,
+  .zoda-fabrics-card__back-cta {
+    font-size: 9px;
+  }
+  .zoda-fabrics-card__face--back {
+    padding: 16px;
+  }
+  .zoda-fabrics-card__back-eyebrow {
+    font-size: clamp(18px, 6vw, 24px);
+  }
+  .zoda-fabrics-card__back-text {
+    font-size: 12px;
+    line-height: 1.42;
+    -webkit-line-clamp: 6;
+  }
+  .zoda-fabrics-card__back-cta {
+    margin-top: auto;
+  }
+  .zoda-fabrics-directory__mobile-ui {
+    align-items: center;
+    display: flex;
+    gap: 20px;
+    margin: 10px auto 0;
+    width: min(74vw, 260px);
+  }
+  .zoda-fabrics-directory__progress {
+    background: rgba(255, 255, 255, 0.18);
+    flex: 1 1 auto;
+    height: 3px;
+    overflow: hidden;
+    transform-origin: left center;
+  }
+  .zoda-fabrics-directory__progress span {
+    background: var(--accent);
+    display: block;
+    height: 100%;
+    transform-origin: left center;
+    transition: transform 220ms ease;
+    width: 100%;
+  }
+  .zoda-fabrics-directory__count {
+    color: #fff;
+    flex: 0 0 auto;
+    font-family: var(--zoda-font-mono, "Commuters Sans", Arial, sans-serif);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    min-width: 54px;
+    text-align: right;
+  }
+  .zoda-fabrics-feature {
+    padding-top: 64px;
+  }
+  .zoda-fabrics-feature__media {
+    flex-basis: clamp(96px, 14svh, 130px);
+  }
+  .zoda-fabrics-feature__body {
+    padding: 10px 16px 14px;
+  }
+  .zoda-fabrics-feature__title {
+    font-size: clamp(18px, 5.2vw, 24px);
+  }
+  .zoda-fabrics-feature__features {
+    gap: 10px;
+  }
+  .zoda-fabrics-feature__features li {
+    width: auto;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .zoda-fabrics-snap__footer {
+    align-items: flex-start;
+  }
+}
+
+/* ============ Fabrics directory — flip cards ============ */
+.zoda-fabrics-card--flip {
+  perspective: 1200px;
+  background: transparent;
+}
+.zoda-fabrics-card--flip .zoda-fabrics-card__hover {
+  display: none;
+}
+.zoda-fabrics-card__flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+}
+.zoda-fabrics-card__face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  overflow: hidden;
+}
+.zoda-fabrics-card__face--back {
+  transform: rotateY(180deg);
+  background: #0a0a0a;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(14px, 2.2vw, 28px);
+  gap: clamp(8px, 1vw, 14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.zoda-fabrics-card__back-eyebrow {
+  font-family: "Euphora", "Commuters Sans", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--accent, #55cda1);
+  line-height: 1.1;
+}
+.zoda-fabrics-card__back-text {
+  font-size: clamp(12px, 0.9vw, 14px);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.zoda-fabrics-card__back-cta {
+  margin-top: auto;
+  font-family: "Commuters Sans", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  border-bottom: 1px solid var(--accent, #55cda1);
+  padding-bottom: 4px;
+}
+@media (hover: hover) {
+  .zoda-fabrics-card--flip:hover .zoda-fabrics-card__flip-inner,
+  .zoda-fabrics-card--flip:focus-visible .zoda-fabrics-card__flip-inner {
+    transform: rotateY(180deg);
+  }
+}
+.zoda-fabrics-card--flip.is-revealed .zoda-fabrics-card__flip-inner {
+  transform: rotateY(180deg);
+}
+
+@media (max-width: 760px) {
+  .zoda-fabrics-page .zoda-fabrics-hero__lede,
+  .zoda-fabrics-page .zoda-fabrics-craft__copy,
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__desc {
+    display: none !important;
+  }
+
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__actions {
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    max-width: 100%;
+  }
+
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__shop,
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__back {
+    box-sizing: border-box;
+    display: inline-flex;
+    font-size: 12px;
+    height: 40px;
+    justify-content: center;
+    line-height: 1;
+    min-height: 0;
+    padding: 0 22px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 760px) {
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: fit-content !important;
+  }
+
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__shop,
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-feature__back {
+    flex: 0 1 auto !important;
+    font-size: clamp(9px, 2.45vw, 11px) !important;
+    letter-spacing: 0.04em !important;
+    max-width: calc(100vw - 32px) !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+    overflow-wrap: anywhere !important;
+    padding-inline: 8px !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+  }
+}
+
+@media (max-width: 500px) {
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-directory .zoda-fabrics-card__face--back {
+    align-items: flex-start;
+    gap: 9px;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .zoda-fabrics-page:not(.zoda-ikigai-page)
+    .zoda-fabrics-directory
+    .zoda-fabrics-card__back-eyebrow {
+    font-size: clamp(17px, 5.4vw, 22px);
+  }
+
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-directory .zoda-fabrics-card__back-text {
+    color: rgba(255, 255, 255, 0.82);
+    display: -webkit-box !important;
+    font-size: clamp(11px, 3.25vw, 13px);
+    line-height: 1.42;
+    margin: 0;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+  }
+
+  .zoda-fabrics-page:not(.zoda-ikigai-page) .zoda-fabrics-directory .zoda-fabrics-card__back-cta {
+    align-self: flex-start;
+    border-bottom: 1px solid var(--accent, #55cda1);
+    color: #fff;
+    display: inline-block !important;
+    font-size: 10px;
+    margin-top: auto;
+    padding-bottom: 4px;
+  }
+}
+
+/* Mobile typography pass. */
+@media (max-width: 760px) {
+  .zoda-fabrics-hero__lede,
+  .zoda-fabrics-directory__lede,
+  .zoda-fabrics-feature__desc,
+  .zoda-fabrics-feature__accordion-panel p,
+  .zoda-fabrics-feature__accordion-list,
+  .zoda-fabrics-card__copy {
+    font-size: clamp(12px, 2.8vw, 14px) !important;
+    line-height: 1.44 !important;
+  }
+
+  .zoda-fabrics-hero__eyebrow,
+  .zoda-fabrics-card__index,
+  .zoda-fabrics-feature__eyebrow,
+  .zoda-fabrics-feature__features span,
+  .zoda-fabrics-feature__accordion-index,
+  .zoda-fabrics-feature__accordion-label,
+  .zoda-fabrics-feature__shop,
+  .zoda-fabrics-feature__back {
+    font-size: clamp(9px, 1.8vw, 10px) !important;
+    line-height: 1.18 !important;
+  }
+}
