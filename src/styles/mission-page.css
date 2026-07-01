@@ -2703,28 +2703,35 @@
 
 .zoda-mission-page--combined .zoda-mission-section {
   box-sizing: border-box;
+  display: grid;
+  justify-items: center;
   min-height: auto;
   overflow: visible;
   padding: var(--mission-combined-pad-y) var(--mission-combined-pad-x);
-}
-
-.zoda-mission-page--combined .zoda-mission-rewards {
-  align-items: center;
-  align-content: center;
-  gap: clamp(32px, 5vw, 72px);
-  grid-template-columns: minmax(260px, 430px) minmax(0, 960px);
-  justify-content: center;
-  justify-self: stretch;
   width: 100%;
 }
 
-.zoda-mission-page--combined .zoda-mission-rewards > *,
-.zoda-mission-final-cta > * {
+.zoda-mission-page--combined .zoda-mission-rewards {
+  justify-self: stretch;
+}
+
+.zoda-mission-rewards__inner {
+  align-items: center;
+  align-content: center;
+  display: grid;
+  gap: clamp(32px, 5vw, 72px);
+  grid-template-columns: minmax(260px, 430px) minmax(0, 960px);
+  justify-content: space-between;
+  width: var(--mission-combined-content);
+}
+
+.zoda-mission-rewards__inner > *,
+.zoda-mission-final-cta__inner > * {
   min-width: 0;
 }
 
 .zoda-mission-page--combined .zoda-mission-rewards__copy {
-  justify-self: end;
+  justify-self: start;
   max-width: 430px;
   text-align: left;
 }
@@ -2764,17 +2771,26 @@
 .zoda-mission-page--combined .zoda-mission-rewards__pricing {
   align-items: stretch;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  max-width: 960px;
+  max-width: none;
+  width: 100%;
 }
 
 .zoda-mission-final-cta {
-  align-items: center;
-  border-top: 1px solid var(--mission-line);
-  gap: clamp(32px, 5vw, 72px);
-  grid-template-columns: minmax(240px, 520px) minmax(240px, 520px);
-  justify-content: center;
   justify-self: stretch;
   width: 100%;
+}
+
+.zoda-mission-final-cta__inner {
+  align-items: center;
+  display: grid;
+  gap: clamp(32px, 5vw, 72px);
+  grid-template-columns: minmax(240px, 520px) minmax(240px, 520px);
+  justify-content: space-between;
+  width: var(--mission-combined-content);
+}
+
+.zoda-mission-final-cta {
+  border-top: 1px solid var(--mission-line);
 }
 
 .zoda-mission-final-cta__copy {
@@ -2846,8 +2862,8 @@
 }
 
 @media (max-width: 980px) {
-  .zoda-mission-page--combined .zoda-mission-rewards,
-  .zoda-mission-final-cta {
+  .zoda-mission-rewards__inner,
+  .zoda-mission-final-cta__inner {
     grid-template-columns: minmax(0, 1fr);
   }
 

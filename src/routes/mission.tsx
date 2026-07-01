@@ -73,64 +73,68 @@ function MissionPage() {
 
       <main className="zoda-mission-combined" aria-label="Mission rewards and final action">
         <section id="mission-rewards" className="zoda-mission-section zoda-mission-rewards">
-          <div className="zoda-mission-copy zoda-mission-rewards__copy">
-            <p className="zoda-mission-kicker">
-              <Medal size={15} aria-hidden="true" /> Reward Tiers
-            </p>
-            <h2>Stack points. Unlock your tier.</h2>
-            <p>
-              Your reward level is based on the points you bank across the mission. Every hit,
-              streak bonus and Beast Save push you closer to the top tier.
-            </p>
-          </div>
-          <div className="zoda-mission-rewards__pricing" aria-label="Mission reward tiers">
-            {REWARD_TIERS.map((tier) => (
-              <article
-                key={tier.name}
-                className="zoda-mission-reward-card"
-                data-tone={tier.tone}
-                data-featured={tier.name === "Beast" ? "true" : undefined}
-              >
-                <div className="zoda-mission-reward-card__head">
-                  <span>{tier.label}</span>
-                  <img src={tier.icon} alt="" aria-hidden="true" />
-                </div>
-                <h3>{tier.name}</h3>
-                <p>{tier.summary}</p>
-                <div className="zoda-mission-reward-card__points">
-                  <strong>{tier.points}</strong>
-                  <span>points</span>
-                </div>
-                <ul>
-                  {tier.rewards.map((reward) => (
-                    <li key={reward}>
-                      <i aria-hidden="true" />
-                      <span>{reward}</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            ))}
+          <div className="zoda-mission-rewards__inner">
+            <div className="zoda-mission-copy zoda-mission-rewards__copy">
+              <p className="zoda-mission-kicker">
+                <Medal size={15} aria-hidden="true" /> Reward Tiers
+              </p>
+              <h2>Stack points. Unlock your tier.</h2>
+              <p>
+                Your reward level is based on the points you bank across the mission. Every hit,
+                streak bonus and Beast Save push you closer to the top tier.
+              </p>
+            </div>
+            <div className="zoda-mission-rewards__pricing" aria-label="Mission reward tiers">
+              {REWARD_TIERS.map((tier) => (
+                <article
+                  key={tier.name}
+                  className="zoda-mission-reward-card"
+                  data-tone={tier.tone}
+                  data-featured={tier.name === "Beast" ? "true" : undefined}
+                >
+                  <div className="zoda-mission-reward-card__head">
+                    <span>{tier.label}</span>
+                    <img src={tier.icon} alt="" aria-hidden="true" />
+                  </div>
+                  <h3>{tier.name}</h3>
+                  <p>{tier.summary}</p>
+                  <div className="zoda-mission-reward-card__points">
+                    <strong>{tier.points}</strong>
+                    <span>points</span>
+                  </div>
+                  <ul>
+                    {tier.rewards.map((reward) => (
+                      <li key={reward}>
+                        <i aria-hidden="true" />
+                        <span>{reward}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
         <section id="mission-cta" className="zoda-mission-section zoda-mission-final-cta">
-          <div className="zoda-mission-final-cta__copy">
-            <p className="zoda-mission-kicker">
-              <ShoppingBag size={15} aria-hidden="true" /> Final Mission
-            </p>
-            <h2>Finish the board. Carry the mission.</h2>
-            <p>
-              Complete the 21-day path, record the Final Mission, and bring the same standard into
-              every session with the ZODA Mission Bag.
-            </p>
-            <a className="zoda-mission-final-cta__button" href="/collections/accessories">
-              Shop Mission Gear
-              <ArrowRight size={16} aria-hidden="true" />
-            </a>
-          </div>
-          <div className="zoda-mission-final-cta__image" aria-label="ZODA Mission Bag">
-            <img src={missionBagImage} alt="ZODA Mission backpack" />
+          <div className="zoda-mission-final-cta__inner">
+            <div className="zoda-mission-final-cta__copy">
+              <p className="zoda-mission-kicker">
+                <ShoppingBag size={15} aria-hidden="true" /> Final Mission
+              </p>
+              <h2>Finish the board. Carry the mission.</h2>
+              <p>
+                Complete the 21-day path, record the Final Mission, and bring the same standard into
+                every session with the ZODA Mission Bag.
+              </p>
+              <a className="zoda-mission-final-cta__button" href="/collections/accessories">
+                Shop Mission Gear
+                <ArrowRight size={16} aria-hidden="true" />
+              </a>
+            </div>
+            <div className="zoda-mission-final-cta__image" aria-label="ZODA Mission Bag">
+              <img src={missionBagImage} alt="ZODA Mission backpack" />
+            </div>
           </div>
         </section>
       </main>
