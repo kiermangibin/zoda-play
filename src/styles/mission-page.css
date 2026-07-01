@@ -2696,7 +2696,7 @@
   background: var(--mission-bg);
   display: grid;
   --mission-combined-content: min(100%, 1560px);
-  --mission-combined-heading: clamp(42px, 5.8vw, 78px);
+  --mission-combined-heading: clamp(34px, 4.2vw, 56px);
   --mission-combined-pad-y: clamp(72px, 8vw, 118px);
   --mission-combined-pad-x: clamp(18px, 4vw, 48px);
 }
@@ -2869,7 +2869,7 @@
 
 @media (max-width: 760px) {
   .zoda-mission-combined {
-    --mission-combined-heading: clamp(34px, 12vw, 54px);
+    --mission-combined-heading: clamp(30px, 9vw, 42px);
     --mission-combined-pad-y: 48px;
     --mission-combined-pad-x: 14px;
   }
