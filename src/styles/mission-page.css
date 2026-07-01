@@ -2700,7 +2700,7 @@
   --mission-combined-pad-x: clamp(18px, 4vw, 48px);
   --mission-combined-content: min(
     calc(100vw - (var(--mission-combined-pad-x) * 2)),
-    1180px
+    1360px
   );
 }
 
