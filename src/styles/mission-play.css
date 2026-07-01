@@ -84,12 +84,15 @@
 }
 
 .zoda-mission-play__header span {
+  align-items: center;
   color: var(--accent);
-  display: block;
+  display: inline-flex;
   font-size: 11px;
   font-weight: 900;
-  letter-spacing: 0.12em;
+  gap: 8px;
+  letter-spacing: 0.14em;
   line-height: 1;
+  margin: 0 0 14px;
   text-transform: uppercase;
 }
 
@@ -99,7 +102,7 @@
   font-weight: 800;
   letter-spacing: 0;
   line-height: 0.96;
-  margin: 8px 0 0;
+  margin: 0;
   max-width: 100%;
   text-transform: uppercase;
 }
