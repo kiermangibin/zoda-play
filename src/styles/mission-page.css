@@ -2938,7 +2938,8 @@
 
   .zoda-mission-page--combined .zoda-mission-play--embedded {
     min-height: auto;
-    padding-top: 18px;
+    padding-bottom: var(--mission-combined-pad-y);
+    padding-top: var(--mission-combined-pad-y);
   }
 
   .zoda-mission-page--combined .zoda-mission-rewards {
