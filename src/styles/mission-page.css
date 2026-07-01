@@ -2700,7 +2700,7 @@
   --mission-combined-pad-x: clamp(18px, 4vw, 48px);
   --mission-combined-content: min(
     calc(100vw - (var(--mission-combined-pad-x) * 2)),
-    1360px
+    1180px
   );
 }
 
@@ -2811,7 +2811,7 @@
   align-items: center;
   display: grid;
   gap: clamp(32px, 5vw, 72px);
-  grid-template-columns: minmax(0, 520px) minmax(0, 680px);
+  grid-template-columns: minmax(0, 520px) minmax(0, 1fr);
   justify-content: space-between;
   width: var(--mission-combined-content);
 }
