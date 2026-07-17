@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { ArrowLeft, BookOpen, Check, Dice5, RotateCcw, Trophy, X } from "lucide-react";
 
+import { AppShell } from "@/components/AppShell";
+import { isAuthenticated } from "@/lib/auth";
 import {
   MISSION_DICE_STORAGE_KEY,
   MISSION_FINAL_STORAGE_KEY,
@@ -24,6 +26,11 @@ import zodaZLogo from "@/assets/zoda-Z.png";
 import "@/styles/mission-play.css";
 
 export const Route = createFileRoute("/mission_/play")({
+  beforeLoad: async () => {
+    if (!(await isAuthenticated())) {
+      throw redirect({ to: "/login", search: { redirect: "/mission/play" } });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Mission Play - ZODA" },
@@ -966,5 +973,9 @@ export function MissionPlayPage({ embedded = false }: { embedded?: boolean } = {
 
   if (embedded) return content;
 
-  return <div className="zoda-shell zoda-shell--light zoda-mission-play-page">{content}</div>;
+  return (
+    <AppShell eyebrow="Mission" title="Play Board">
+      <div className="zoda-shell zoda-shell--light zoda-mission-play-page">{content}</div>
+    </AppShell>
+  );
 }

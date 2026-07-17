@@ -1,0 +1,227 @@
+.zoda-auth-page {
+  align-items: center;
+  background:
+    radial-gradient(circle at 15% 12%, rgba(95, 173, 86, 0.18), transparent 32rem),
+    linear-gradient(135deg, #111310 0%, #f3efe5 48%, #d9f06d 100%);
+  box-sizing: border-box;
+  color: #151913;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.zoda-auth-panel {
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(21, 25, 19, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  max-width: 29rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  width: min(100%, 29rem);
+}
+
+.zoda-auth-panel__brand {
+  align-items: center;
+  display: flex;
+  font-size: 0.78rem;
+  font-weight: 900;
+  gap: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.zoda-auth-panel__brand img {
+  height: 2rem;
+  object-fit: contain;
+  width: 2rem;
+}
+
+.zoda-auth-panel__headline {
+  margin: 2rem 0 1.25rem;
+}
+
+.zoda-auth-panel__headline p {
+  color: #5d6b28;
+  font-size: 0.76rem;
+  font-weight: 900;
+  margin: 0 0 0.45rem;
+  text-transform: uppercase;
+}
+
+.zoda-auth-panel__headline h1 {
+  font-size: clamp(2rem, 7vw, 3.35rem);
+  line-height: 0.9;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.zoda-auth-toggle {
+  background: rgba(21, 25, 19, 0.08);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: 1fr 1fr;
+  padding: 0.25rem;
+}
+
+.zoda-auth-toggle button {
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: rgba(21, 25, 19, 0.72);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 900;
+  min-height: 2.75rem;
+  text-transform: uppercase;
+}
+
+.zoda-auth-toggle button[aria-selected="true"] {
+  background: #151913;
+  color: #f7f4eb;
+}
+
+.zoda-auth-form {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.25rem;
+}
+
+.zoda-auth-form label {
+  display: grid;
+  gap: 0.45rem;
+  position: relative;
+}
+
+.zoda-auth-form label > span {
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.zoda-auth-form label > i {
+  align-items: center;
+  bottom: 0;
+  color: rgba(21, 25, 19, 0.55);
+  display: flex;
+  height: 3rem;
+  left: 0.9rem;
+  position: absolute;
+}
+
+.zoda-auth-form input {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(21, 25, 19, 0.16);
+  border-radius: 8px;
+  box-sizing: border-box;
+  color: #151913;
+  min-height: 3rem;
+  outline: none;
+  padding: 0 1rem 0 2.75rem;
+  width: 100%;
+}
+
+.zoda-auth-form input:focus {
+  border-color: #6b7f21;
+  box-shadow: 0 0 0 3px rgba(217, 240, 109, 0.45);
+}
+
+.zoda-auth-form__error {
+  background: rgba(176, 42, 36, 0.1);
+  border: 1px solid rgba(176, 42, 36, 0.25);
+  border-radius: 8px;
+  color: #8d1f1a;
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+}
+
+.zoda-auth-form__notice {
+  background: rgba(87, 145, 68, 0.12);
+  border: 1px solid rgba(87, 145, 68, 0.28);
+  border-radius: 8px;
+  color: #355f26;
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+}
+
+.zoda-auth-form__submit {
+  align-items: center;
+  background: #d9f06d;
+  border: 1px solid rgba(21, 25, 19, 0.14);
+  border-radius: 8px;
+  color: #151913;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 950;
+  gap: 0.5rem;
+  justify-content: center;
+  min-height: 3.15rem;
+  text-transform: uppercase;
+}
+
+.zoda-auth-form__submit:disabled {
+  cursor: wait;
+  opacity: 0.66;
+}
+
+.zoda-auth-session {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.7rem;
+}
+
+.zoda-auth-session span {
+  color: currentColor;
+  font-size: 0.7rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  max-width: 13rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.zoda-auth-session button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  opacity: 0.72;
+  padding: 0;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease;
+  width: 2rem;
+}
+
+.zoda-auth-session button:hover,
+.zoda-auth-session button:focus-visible {
+  background: rgba(21, 25, 19, 0.08);
+  opacity: 1;
+  outline: 0;
+}
+
+@media (max-width: 38rem) {
+  .zoda-auth-page {
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .zoda-auth-panel {
+    margin: auto 0;
+  }
+}

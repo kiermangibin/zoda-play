@@ -1,146 +1,122 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Medal, ShoppingBag } from "lucide-react";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { ArrowRight, Gift, Package, Play, Trophy } from "lucide-react";
 
-import { MissionPlayPage } from "./mission_.play";
-import ascenderTrophy from "@/assets/ascender-trophy.png";
-import missionBagImage from "@/assets/Backpack.png";
-import beastTrophy from "@/assets/finisher-trophy.png";
-import initiatorTrophy from "@/assets/Initiator-trophy.png";
-import "@/styles/mission-page.css";
+import { AppShell } from "@/components/AppShell";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { isAuthenticated } from "@/lib/auth";
+import { REWARD_TIERS } from "@/lib/mission-content";
 
 export const Route = createFileRoute("/mission")({
+  beforeLoad: async () => {
+    if (!(await isAuthenticated())) {
+      throw redirect({ to: "/login", search: { redirect: "/mission" } });
+    }
+  },
   head: () => ({
     meta: [
-      { title: "The Mission - ZODA" },
+      { title: "Mission Control - ZODA" },
       {
         name: "description",
-        content:
-          "Play ZODA's 21-day Mission game, track progress, unlock reward tiers and complete the final mission.",
-      },
-      { property: "og:title", content: "The Mission - ZODA" },
-      {
-        property: "og:description",
-        content:
-          "A combined Mission game and rewards page for the 21-day ZODA challenge.",
+        content: "ZODA Mission control center with play, rewards and final mission actions.",
       },
     ],
   }),
-  component: MissionPage,
+  component: MissionOverviewPage,
 });
 
-const REWARD_TIERS = [
+const overviewCards = [
   {
-    name: "Initiator",
-    points: "1+",
-    label: "Tier 1",
-    icon: initiatorTrophy,
-    tone: "gold",
-    summary: "Get on the board and prove the mission has started.",
-    rewards: [
-      "Mission tier status",
-      "Week 1 finisher badge",
-      "Progress counted toward the final run",
-    ],
+    description: "Roll the dice, clear weekly tasks, and keep your streak alive.",
+    icon: Play,
+    label: "Open board",
+    title: "Mission Play",
+    to: "/mission/play",
   },
   {
-    name: "Ascender",
-    points: "300+",
-    label: "Tier 2",
-    icon: ascenderTrophy,
-    tone: "coral",
-    summary: "Clear the middle gate with enough points to show consistency.",
-    rewards: [
-      "Ascender badge tier",
-      "Higher leaderboard placement",
-      "Final Mission qualification path",
-    ],
+    description: "Review tier targets and what each score level unlocks.",
+    icon: Trophy,
+    label: "View tiers",
+    title: "Rewards",
+    to: "/mission/rewards",
   },
   {
-    name: "Beast",
-    points: "450+",
-    label: "Top Tier",
-    icon: beastTrophy,
-    tone: "green",
-    summary: "Reach the official target score and finish in Beast territory.",
-    rewards: ["Beast badge tier", "Win-qualified mission score", "Full Play & Win status"],
+    description: "Reserve the ZODA Mission Bag and finish the challenge path.",
+    icon: Package,
+    label: "Reserve",
+    title: "Mission Bag",
+    to: "/mission/bag",
   },
 ];
 
-function MissionPage() {
+function MissionOverviewPage() {
   return (
-    <div className="zoda-shell zoda-shell--light zoda-mission-page zoda-mission-page--combined">
-      <MissionPlayPage embedded />
-
-      <main className="zoda-mission-combined" aria-label="Mission rewards and final action">
-        <section id="mission-rewards" className="zoda-mission-section zoda-mission-rewards">
-          <div className="zoda-mission-rewards__inner">
-            <div className="zoda-mission-copy zoda-mission-rewards__copy">
-              <p className="zoda-mission-kicker">
-                <Medal size={15} aria-hidden="true" /> Reward Tiers
-              </p>
-              <h2>Stack points. Unlock your tier.</h2>
-              <p>
-                Your reward level is based on the points you bank across the mission. Every hit,
-                streak bonus and Beast Save push you closer to the top tier.
+    <AppShell eyebrow="Mission" title="Control Center">
+      <main className="mx-auto grid w-full max-w-6xl gap-6 p-4 md:p-6">
+        <section className="grid gap-4">
+          <Badge className="w-fit gap-2" variant="secondary">
+            <Gift className="size-3.5" />
+            21-day build a habit mission
+          </Badge>
+          <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
+            <div>
+              <h2 className="max-w-3xl text-4xl font-black uppercase leading-none tracking-normal md:text-6xl">
+                Roll. Complete. Climb.
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-muted-foreground">
+                Your mission is now split into focused pages. Start with the board, check your
+                reward tier, then move into the final bag action when the run is complete.
               </p>
             </div>
-            <div className="zoda-mission-rewards__pricing" aria-label="Mission reward tiers">
-              {REWARD_TIERS.map((tier) => (
-                <article
-                  key={tier.name}
-                  className="zoda-mission-reward-card"
-                  data-tone={tier.tone}
-                  data-featured={tier.name === "Beast" ? "true" : undefined}
-                >
-                  <div className="zoda-mission-reward-card__head">
-                    <span>{tier.label}</span>
-                    <img src={tier.icon} alt="" aria-hidden="true" />
-                  </div>
-                  <h3>{tier.name}</h3>
-                  <p>{tier.summary}</p>
-                  <div className="zoda-mission-reward-card__points">
-                    <strong>{tier.points}</strong>
-                    <span>points</span>
-                  </div>
-                  <ul>
-                    {tier.rewards.map((reward) => (
-                      <li key={reward}>
-                        <i aria-hidden="true" />
-                        <span>{reward}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
+            <Button asChild size="lg">
+              <Link to="/mission/play">
+                Start Playing
+                <ArrowRight />
+              </Link>
+            </Button>
           </div>
         </section>
 
-        <section id="mission-cta" className="zoda-mission-section zoda-mission-final-cta">
-          <div className="zoda-mission-final-cta__inner">
-            <div className="zoda-mission-final-cta__copy">
-              <p className="zoda-mission-kicker">
-                <ShoppingBag size={15} aria-hidden="true" /> Final Mission
-              </p>
-              <h2>Reserve the Mission Bag.</h2>
-              <p>
-                Join the prelaunch waitlist for the everything backpack built to carry your
-                training, travel, recovery, and daily mission.
-              </p>
-              <a
-                className="zoda-mission-final-cta__button"
-                href="https://prelaunch.com/projects/zoda-mission-zoda-mission-the-everything-backpack"
-              >
-                Reserve Your Spot
-                <ArrowRight size={16} aria-hidden="true" />
-              </a>
-            </div>
-            <div className="zoda-mission-final-cta__image" aria-label="ZODA Mission Bag">
-              <img src={missionBagImage} alt="ZODA Mission backpack" />
-            </div>
-          </div>
+        <section className="grid gap-4 md:grid-cols-3">
+          {overviewCards.map((card) => (
+            <Card key={card.title} className="border-border/80 bg-card/80">
+              <CardHeader>
+                <div className="mb-2 flex size-9 items-center justify-center rounded-md bg-primary/12 text-primary">
+                  <card.icon className="size-4" />
+                </div>
+                <CardTitle>{card.title}</CardTitle>
+                <CardDescription>{card.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild className="w-full" variant="outline">
+                  <Link to={card.to}>
+                    {card.label}
+                    <ArrowRight />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-3">
+          {REWARD_TIERS.map((tier) => (
+            <Card key={tier.name} className="bg-card/60">
+              <CardHeader className="flex-row items-center justify-between gap-4">
+                <div>
+                  <CardDescription>{tier.label}</CardDescription>
+                  <CardTitle>{tier.name}</CardTitle>
+                </div>
+                <img className="size-12 object-contain" src={tier.icon} alt="" aria-hidden="true" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-black text-primary">{tier.points} pts</p>
+              </CardContent>
+            </Card>
+          ))}
         </section>
       </main>
-    </div>
+    </AppShell>
   );
 }
