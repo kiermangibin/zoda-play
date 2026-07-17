@@ -1,5 +1,8 @@
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/lib/auth";
+import "@/styles/auth.css";
 import "@/styles/globals.css";
 import "@/styles/fonts.css";
 import "@/styles/tokens.css";
@@ -11,7 +14,13 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  return <Outlet />;
+  return (
+    <AuthProvider>
+      <TooltipProvider>
+        <Outlet />
+      </TooltipProvider>
+    </AuthProvider>
+  );
 }
 
 function NotFoundComponent() {

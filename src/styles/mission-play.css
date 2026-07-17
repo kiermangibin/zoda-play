@@ -83,6 +83,24 @@
   outline: 0;
 }
 
+.zoda-mission-play__header .zoda-auth-session {
+  color: var(--accent);
+  max-width: min(16rem, 42vw);
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.zoda-mission-play__header .zoda-auth-session button {
+  color: rgba(247, 244, 234, 0.82);
+}
+
+.zoda-mission-play__header .zoda-auth-session button:hover,
+.zoda-mission-play__header .zoda-auth-session button:focus-visible {
+  background: rgba(85, 205, 161, 0.12);
+  color: var(--accent);
+}
+
 .zoda-mission-play__header span {
   align-items: center;
   color: var(--accent);
@@ -1010,6 +1028,12 @@
 
   .zoda-mission-play__back {
     justify-self: start;
+    position: static;
+  }
+
+  .zoda-mission-play__header .zoda-auth-session {
+    justify-self: center;
+    max-width: 100%;
     position: static;
   }
 
