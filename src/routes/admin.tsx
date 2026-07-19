@@ -4,7 +4,6 @@ import {
   Activity,
   AlertCircle,
   BarChart3,
-  CalendarPlus,
   CheckCircle2,
   Clock,
   Moon,
@@ -80,26 +79,6 @@ function startOfDay(date: Date) {
   return nextDate;
 }
 
-function buildDailyCounts(profiles: Profile[], field: "created_at" | "last_seen_at") {
-  const today = startOfDay(new Date());
-
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(today);
-    date.setDate(today.getDate() - (6 - index));
-    const nextDate = new Date(date);
-    nextDate.setDate(date.getDate() + 1);
-
-    return {
-      count: profiles.filter((profile) => {
-        const value = new Date(profile[field]);
-        return value >= date && value < nextDate;
-      }).length,
-      dateLabel: formatChartDate(date),
-      label: new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date),
-    };
-  });
-}
-
 function buildWeeklyOutcomes(results: MissionResult[]) {
   const today = startOfDay(new Date());
 
@@ -136,6 +115,37 @@ function buildWeekCompletion(results: MissionResult[]) {
       total: weekResults.length,
     };
   });
+}
+
+function buildTopPlayers(results: MissionResult[]) {
+  const players = new Map<
+    string,
+    { email: string; fail: number; final: number; hit: number; name: string; points: number; total: number }
+  >();
+
+  results.forEach((result) => {
+    const email = result.user_email;
+    const player =
+      players.get(email) ??
+      {
+        email,
+        fail: 0,
+        final: 0,
+        hit: 0,
+        name: result.user_name || email,
+        points: 0,
+        total: 0,
+      };
+
+    player[result.result] += 1;
+    player.points += Number(result.points);
+    player.total += 1;
+    players.set(email, player);
+  });
+
+  return [...players.values()]
+    .sort((a, b) => b.hit + b.final - (a.hit + a.final) || b.points - a.points || b.total - a.total)
+    .slice(0, 5);
 }
 
 function AdminPage() {
@@ -239,10 +249,9 @@ function AdminPage() {
     };
   }, [missionResults]);
 
-  const dailyActive = useMemo(() => buildDailyCounts(profiles, "last_seen_at"), [profiles]);
-  const dailySignups = useMemo(() => buildDailyCounts(profiles, "created_at"), [profiles]);
   const weeklyOutcomes = useMemo(() => buildWeeklyOutcomes(missionResults), [missionResults]);
   const weekCompletion = useMemo(() => buildWeekCompletion(missionResults), [missionResults]);
+  const topPlayers = useMemo(() => buildTopPlayers(missionResults), [missionResults]);
   const recentMissionResults = useMemo(() => missionResults.slice(0, 8), [missionResults]);
   const recentActive = useMemo(
     () =>
@@ -393,32 +402,32 @@ function AdminPage() {
         ) : null}
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <AnalyticsCard
-            data={dailyActive}
-            description="Users with a profile update each day."
-            icon={<Activity className="size-4 text-primary" />}
-            title="Daily activity"
+          <OutcomeTrendCard
+            data={weeklyOutcomes}
+            description="Hits, fails and final completions grouped by week."
+            icon={<BarChart3 className="size-4 text-primary" />}
+            title="Weekly outcomes"
           />
-          <AnalyticsCard
-            data={dailySignups}
-            description="New profile rows created each day."
-            icon={<CalendarPlus className="size-4 text-primary" />}
-            title="Daily signups"
+          <CompletionRateTrendCard
+            data={weeklyOutcomes}
+            description="Successful hits and finals compared with failed attempts."
+            icon={<TrendingUp className="size-4 text-primary" />}
+            title="Completion rate trend"
           />
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <OutcomeTrendCard
-            data={weeklyOutcomes}
-            description="Hit, fail and final-complete results grouped by week."
-            icon={<BarChart3 className="size-4 text-primary" />}
-            title="Weekly outcomes"
-          />
           <WeekCompletionCard
             data={weekCompletion}
             description="All recorded completions by mission week."
             icon={<Target className="size-4 text-primary" />}
             title="Completion by week"
+          />
+          <TopPlayersCard
+            data={topPlayers}
+            description="Top users by successful mission results."
+            icon={<Trophy className="size-4 text-primary" />}
+            title="Top players"
           />
         </section>
 
@@ -571,18 +580,36 @@ function RecentProfilesCard({
   );
 }
 
-function AnalyticsCard({
+function CompletionRateTrendCard({
   data,
   description,
   icon,
   title,
 }: {
-  data: Array<{ count: number; dateLabel: string; label: string }>;
+  data: Array<{ fail: number; final: number; hit: number; label: string }>;
   description: string;
   icon: ReactNode;
   title: string;
 }) {
-  const max = Math.max(...data.map((item) => item.count), 1);
+  const chartPoints = data.map((item) => {
+    const total = item.hit + item.fail + item.final;
+    const success = item.hit + item.final;
+
+    return {
+      label: item.label,
+      rate: total ? Math.round((success / total) * 100) : 0,
+      total,
+    };
+  });
+  const polylinePoints = chartPoints
+    .map((item, index) => {
+      const x = chartPoints.length === 1 ? 120 : 18 + (index / (chartPoints.length - 1)) * 204;
+      const y = 112 - (item.rate / 100) * 88;
+
+      return `${x},${y}`;
+    })
+    .join(" ");
+  const latest = chartPoints.at(-1);
 
   return (
     <Card>
@@ -594,21 +621,41 @@ function AnalyticsCard({
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex h-44 items-end gap-2">
-          {data.map((item) => (
-            <div className="flex min-w-0 flex-1 flex-col items-center gap-2" key={item.label}>
-              <div className="flex h-32 w-full items-end rounded bg-muted/60 p-1">
-                <div
-                  className="w-full rounded bg-primary"
-                  style={{ height: `${Math.max((item.count / max) * 100, item.count ? 8 : 0)}%` }}
-                />
-              </div>
-              <div className="grid gap-0.5 text-center">
-                <span className="text-xs font-semibold text-foreground">{item.count}</span>
-                <span className="text-[10px] uppercase text-muted-foreground">{item.label}</span>
-                <span className="text-[10px] text-muted-foreground">{item.dateLabel}</span>
-              </div>
-            </div>
+        <div className="mb-3 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-3xl font-semibold">{latest ? `${latest.rate}%` : "0%"}</p>
+            <p className="text-xs text-muted-foreground">Latest week</p>
+          </div>
+          <Badge variant="secondary">{latest?.total ?? 0} results</Badge>
+        </div>
+        <svg
+          aria-label="Completion rate trend"
+          className="h-32 w-full overflow-visible"
+          preserveAspectRatio="none"
+          role="img"
+          viewBox="0 0 240 128"
+        >
+          <line className="stroke-border" x1="18" x2="222" y1="24" y2="24" />
+          <line className="stroke-border" x1="18" x2="222" y1="68" y2="68" />
+          <line className="stroke-border" x1="18" x2="222" y1="112" y2="112" />
+          <polyline
+            className="fill-none stroke-primary"
+            points={polylinePoints}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="4"
+            vectorEffect="non-scaling-stroke"
+          />
+          {chartPoints.map((item, index) => {
+            const x = chartPoints.length === 1 ? 120 : 18 + (index / (chartPoints.length - 1)) * 204;
+            const y = 112 - (item.rate / 100) * 88;
+
+            return <circle className="fill-background stroke-primary" cx={x} cy={y} key={item.label} r="4" />;
+          })}
+        </svg>
+        <div className="mt-2 grid grid-cols-6 gap-1 text-center text-[10px] text-muted-foreground">
+          {chartPoints.map((item) => (
+            <span key={item.label}>{item.label}</span>
           ))}
         </div>
       </CardContent>
@@ -728,6 +775,64 @@ function WeekCompletionCard({
             </div>
           ))}
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function TopPlayersCard({
+  data,
+  description,
+  icon,
+  title,
+}: {
+  data: Array<{ email: string; fail: number; final: number; hit: number; name: string; points: number; total: number }>;
+  description: string;
+  icon: ReactNode;
+  title: string;
+}) {
+  const max = Math.max(...data.map((item) => item.hit + item.final), 1);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          {icon}
+          {title}
+        </CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {data.length > 0 ? (
+          <div className="grid gap-4">
+            {data.map((player) => {
+              const successes = player.hit + player.final;
+
+              return (
+                <div className="grid gap-2" key={player.email}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{player.name}</p>
+                      <p className="truncate text-xs text-muted-foreground">{player.email}</p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-sm font-semibold">{successes} done</p>
+                      <p className="text-xs text-muted-foreground">{player.fail} fail</p>
+                    </div>
+                  </div>
+                  <div className="h-3 overflow-hidden rounded bg-muted">
+                    <div
+                      className="h-full rounded bg-primary"
+                      style={{ width: `${Math.max((successes / max) * 100, successes ? 6 : 0)}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No player results yet.</p>
+        )}
       </CardContent>
     </Card>
   );
