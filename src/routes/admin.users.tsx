@@ -68,9 +68,27 @@ function getAdminActionErrorMessage(message: string) {
   return message;
 }
 
+async function getInviteAdminErrorMessage(error: Error) {
+  const context = (error as Error & { context?: Response }).context;
+
+  if (context) {
+    try {
+      const body = (await context.clone().json()) as { error?: unknown };
+      if (typeof body.error === "string") {
+        return getAdminActionErrorMessage(body.error);
+      }
+    } catch {
+      // Fall back to the SDK error message.
+    }
+  }
+
+  return getAdminActionErrorMessage(error.message);
+}
+
 function AdminUsersPage() {
   const { currentUser } = useAuth();
   const [adminEmail, setAdminEmail] = useState("");
+  const [adminName, setAdminName] = useState("");
   const [admins, setAdmins] = useState<AdminRow[]>([]);
   const [error, setError] = useState("");
   const [isAddingAdmin, setIsAddingAdmin] = useState(false);
@@ -136,23 +154,31 @@ function AdminUsersPage() {
     }
 
     const email = normalizeEmail(adminEmail);
+    const name = adminName.trim();
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setMessage("Enter a valid email address.");
+      return;
+    }
+
+    if (name.length < 2) {
+      setMessage("Enter the admin's name.");
       return;
     }
 
     setIsAddingAdmin(true);
     setMessage("");
 
-    const { error: addError } = await supabase.rpc("add_admin_user", {
-      admin_email: email,
+    const { error: inviteError } = await supabase.functions.invoke("invite-admin-user", {
+      body: { email, name },
     });
 
-    if (addError) {
-      setMessage(getAdminActionErrorMessage(addError.message));
+    if (inviteError) {
+      setMessage(await getInviteAdminErrorMessage(inviteError));
     } else {
       setAdminEmail("");
-      setMessage(`${email} is now an admin.`);
+      setAdminName("");
+      setMessage(`Invite sent to ${email}. They can set their password from the email link.`);
       await loadAdmins();
     }
 
@@ -206,12 +232,22 @@ function AdminUsersPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShieldPlus className="size-4 text-primary" />
-                Add admin
+                Invite admin
               </CardTitle>
-              <CardDescription>Give dashboard access to another signed-in user.</CardDescription>
+              <CardDescription>Send an invite link so the admin can set their password.</CardDescription>
             </CardHeader>
             <CardContent>
               <form className="grid gap-3" onSubmit={handleAddAdmin}>
+                <div className="grid gap-2">
+                  <Label htmlFor="admin-name">Name</Label>
+                  <Input
+                    id="admin-name"
+                    placeholder="Trisha Baltazar"
+                    type="text"
+                    value={adminName}
+                    onChange={(event) => setAdminName(event.target.value)}
+                  />
+                </div>
                 <div className="grid gap-2">
                   <Label htmlFor="admin-email">Email</Label>
                   <Input
@@ -224,7 +260,7 @@ function AdminUsersPage() {
                 </div>
                 <Button disabled={isAddingAdmin} type="submit">
                   <UserPlus />
-                  {isAddingAdmin ? "Adding..." : "Add admin"}
+                  {isAddingAdmin ? "Sending..." : "Send invite"}
                 </Button>
                 {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
               </form>
