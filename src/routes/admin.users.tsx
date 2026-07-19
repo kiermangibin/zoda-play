@@ -3,6 +3,16 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AlertCircle, ShieldCheck, ShieldPlus, Trash2, UserPlus, Users } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -191,6 +201,12 @@ function AdminUsersPage() {
       return;
     }
 
+    if (currentUser?.email === email) {
+      setMessage("You cannot remove your own admin access.");
+      setPendingRemoveEmail("");
+      return;
+    }
+
     setRemovingEmail(email);
     setMessage("");
 
@@ -208,6 +224,8 @@ function AdminUsersPage() {
 
     setRemovingEmail("");
   }
+
+  const pendingRemoveAdmin = admins.find((admin) => admin.email === pendingRemoveEmail);
 
   return (
     <AppShell eyebrow="Admin" title="Admin Users">
@@ -296,7 +314,6 @@ function AdminUsersPage() {
                   {admins.length > 0 ? (
                     admins.map((admin) => {
                       const isCurrentUser = currentUser?.email === admin.email;
-                      const isPendingRemove = pendingRemoveEmail === admin.email;
                       const isRemoving = removingEmail === admin.email;
 
                       return (
@@ -308,40 +325,23 @@ function AdminUsersPage() {
                           <TableCell>{formatTimestamp(admin.created_at)}</TableCell>
                           <TableCell>{formatTimestamp(admin.last_seen_at)}</TableCell>
                           <TableCell className="text-right">
-                            {isPendingRemove ? (
-                              <div className="flex justify-end gap-2">
-                                <Button
-                                  disabled={isRemoving}
-                                  size="sm"
-                                  type="button"
-                                  variant="ghost"
-                                  onClick={() => setPendingRemoveEmail("")}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  disabled={isRemoving}
-                                  size="sm"
-                                  type="button"
-                                  variant="destructive"
-                                  onClick={() => void handleRemoveAdmin(admin.email)}
-                                >
-                                  {isRemoving ? "Removing..." : "Confirm"}
-                                </Button>
-                              </div>
-                            ) : (
-                              <Button
-                                aria-label={`Remove ${admin.email} admin access`}
-                                disabled={isRemoving}
-                                size="sm"
-                                type="button"
-                                variant={isCurrentUser ? "outline" : "destructive"}
-                                onClick={() => setPendingRemoveEmail(admin.email)}
-                              >
-                                <Trash2 />
-                                {isCurrentUser ? "Self" : "Remove"}
-                              </Button>
-                            )}
+                            <Button
+                              aria-label={
+                                isCurrentUser
+                                  ? "You cannot remove your own admin access"
+                                  : `Remove ${admin.email} admin access`
+                              }
+                              disabled={isCurrentUser || isRemoving}
+                              size="sm"
+                              type="button"
+                              variant={isCurrentUser ? "outline" : "destructive"}
+                              onClick={() => {
+                                if (!isCurrentUser) setPendingRemoveEmail(admin.email);
+                              }}
+                            >
+                              <Trash2 />
+                              {isCurrentUser ? "Self" : "Remove"}
+                            </Button>
                           </TableCell>
                         </TableRow>
                       );
@@ -358,6 +358,41 @@ function AdminUsersPage() {
             </CardContent>
           </Card>
         </section>
+
+        <AlertDialog
+          open={Boolean(pendingRemoveAdmin)}
+          onOpenChange={(isOpen) => {
+            if (!isOpen && !removingEmail) setPendingRemoveEmail("");
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove admin access?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will remove admin dashboard access for{" "}
+                <span className="font-medium text-foreground">
+                  {pendingRemoveAdmin?.email}
+                </span>
+                . They will remain a regular mission user.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={Boolean(removingEmail)}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                disabled={Boolean(removingEmail)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (pendingRemoveAdmin) void handleRemoveAdmin(pendingRemoveAdmin.email);
+                }}
+              >
+                {removingEmail ? "Removing..." : "Remove admin"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </AppShell>
   );
