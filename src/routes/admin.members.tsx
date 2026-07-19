@@ -439,8 +439,9 @@ function AdminMembersPage() {
                 <span className="font-medium text-foreground">
                   {pendingDeleteTargetEmail}
                 </span>{" "}
-                from Supabase Auth, remove their profile and admin access, and block the account
-                from signing back in.
+                from Supabase Auth, remove their profile
+                {pendingDeleteProfile?.role === "admin" ? " and admin access" : ""}, and block
+                the account from signing back in.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
