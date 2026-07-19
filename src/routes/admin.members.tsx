@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getCurrentUser, isAuthenticated, userHasAdminAccess } from "@/lib/auth";
+import { formatTimestamp } from "@/lib/dates";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin/members")({
@@ -45,13 +46,6 @@ type Profile = {
 };
 
 type RoleFilter = "all" | "admin" | "user";
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
 
 function AdminMembersPage() {
   const [error, setError] = useState("");
@@ -238,8 +232,8 @@ function AdminMembersPage() {
                             {profile.role}
                           </Badge>
                         </TableCell>
-                        <TableCell>{formatDate(profile.created_at)}</TableCell>
-                        <TableCell>{formatDate(profile.last_seen_at)}</TableCell>
+                        <TableCell>{formatTimestamp(profile.created_at)}</TableCell>
+                        <TableCell>{formatTimestamp(profile.last_seen_at)}</TableCell>
                         <TableCell className="text-right">
                           <Button
                             disabled={isUpdating}

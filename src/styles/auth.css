@@ -170,6 +170,23 @@
   opacity: 0.66;
 }
 
+.zoda-auth-form__link {
+  color: #4f6419;
+  font-size: 0.78rem;
+  font-weight: 900;
+  justify-self: start;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.zoda-auth-form__link:hover,
+.zoda-auth-form__link:focus-visible {
+  color: #151913;
+  outline: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+
 .zoda-auth-session {
   align-items: center;
   display: inline-flex;

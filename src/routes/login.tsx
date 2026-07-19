@@ -1,5 +1,5 @@
 import { FormEvent, useMemo, useState } from "react";
-import { createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
+import { Link, createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
 import { ArrowRight, LockKeyhole, Mail, UserRound } from "lucide-react";
 
 import { isAuthenticated, useAuth } from "@/lib/auth";
@@ -42,7 +42,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: "/login" });
   const redirectTo = useMemo(() => getSafeRedirect(search.redirect), [search.redirect]);
-  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-up");
+  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -175,6 +175,12 @@ function LoginPage() {
               value={password}
             />
           </label>
+
+          {mode === "sign-in" ? (
+            <Link className="zoda-auth-form__link" to="/forgot-password">
+              Forgot password?
+            </Link>
+          ) : null}
 
           {error ? <p className="zoda-auth-form__error">{error}</p> : null}
           {notice ? <p className="zoda-auth-form__notice">{notice}</p> : null}

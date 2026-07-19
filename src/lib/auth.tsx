@@ -18,9 +18,11 @@ type AuthContextValue = {
   hasAuthConfig: boolean;
   isAdmin: boolean;
   isAuthenticated: boolean;
+  requestPasswordReset: (email: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => void;
   signUp: (input: { email: string; name: string; password: string }) => Promise<SignUpResult>;
+  updatePassword: (password: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -153,6 +155,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       hasAuthConfig: hasSupabaseConfig,
       isAdmin,
       isAuthenticated: Boolean(currentUser),
+      requestPasswordReset: async (email) => {
+        const normalizedEmail = normalizeEmail(email);
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+          throw new Error("Enter a valid email address.");
+        }
+
+        const { error } = await requireSupabase().auth.resetPasswordForEmail(normalizedEmail, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+
+        if (error) throw new Error(error.message);
+      },
       signIn: async (email, password) => {
         const normalizedEmail = normalizeEmail(email);
         const client = requireSupabase();
@@ -204,6 +219,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await syncUserProfile(nextUser);
         }
         return { needsEmailConfirmation: Boolean(data.user && !data.session) };
+      },
+      updatePassword: async (password) => {
+        if (password.length < 8) {
+          throw new Error("Use at least 8 characters for your password.");
+        }
+
+        const { error } = await requireSupabase().auth.updateUser({ password });
+
+        if (error) throw new Error(error.message);
       },
     }),
     [currentUser, isAdmin],

@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getCurrentUser, isAuthenticated, useAuth, userHasAdminAccess } from "@/lib/auth";
+import { formatTimestamp } from "@/lib/dates";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin/users")({
@@ -57,15 +58,6 @@ type AdminRow = AdminEmail & {
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
-}
-
-function formatDate(value: string | undefined) {
-  if (!value) return "Pending signup";
-
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
 }
 
 function AdminUsersPage() {
@@ -269,8 +261,8 @@ function AdminUsersPage() {
                             {admin.name ?? "Pending signup"}
                           </TableCell>
                           <TableCell>{admin.email}</TableCell>
-                          <TableCell>{formatDate(admin.created_at)}</TableCell>
-                          <TableCell>{formatDate(admin.last_seen_at)}</TableCell>
+                          <TableCell>{formatTimestamp(admin.created_at)}</TableCell>
+                          <TableCell>{formatTimestamp(admin.last_seen_at)}</TableCell>
                           <TableCell className="text-right">
                             {isPendingRemove ? (
                               <div className="flex justify-end gap-2">

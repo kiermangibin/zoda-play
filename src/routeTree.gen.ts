@@ -8,12 +8,14 @@ import { Route as rootRouteImport } from "./routes/__root";
 import { Route as AdminMembersRouteImport } from "./routes/admin.members";
 import { Route as AdminRouteImport } from "./routes/admin";
 import { Route as AdminUsersRouteImport } from "./routes/admin.users";
+import { Route as ForgotPasswordRouteImport } from "./routes/forgot-password";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as LoginRouteImport } from "./routes/login";
 import { Route as MissionRouteImport } from "./routes/mission";
 import { Route as MissionBagRouteImport } from "./routes/mission.bag";
 import { Route as MissionRewardsRouteImport } from "./routes/mission.rewards";
 import { Route as MissionPlayRouteImport } from "./routes/mission_.play";
+import { Route as ResetPasswordRouteImport } from "./routes/reset-password";
 
 const IndexRoute = IndexRouteImport.update({
   id: "/",
@@ -30,6 +32,18 @@ const MissionRoute = MissionRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: "/login",
   path: "/login",
+  getParentRoute: () => rootRouteImport,
+} as any);
+
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: "/forgot-password",
+  path: "/forgot-password",
+  getParentRoute: () => rootRouteImport,
+} as any);
+
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: "/reset-password",
+  path: "/reset-password",
   getParentRoute: () => rootRouteImport,
 } as any);
 
@@ -74,11 +88,13 @@ export interface FileRoutesByFullPath {
   "/admin": typeof AdminRoute;
   "/admin/members": typeof AdminMembersRoute;
   "/admin/users": typeof AdminUsersRoute;
+  "/forgot-password": typeof ForgotPasswordRoute;
   "/login": typeof LoginRoute;
   "/mission": typeof MissionRoute;
   "/mission/bag": typeof MissionBagRoute;
   "/mission/play": typeof MissionPlayRoute;
   "/mission/rewards": typeof MissionRewardsRoute;
+  "/reset-password": typeof ResetPasswordRoute;
 }
 
 export interface FileRoutesByTo {
@@ -86,11 +102,13 @@ export interface FileRoutesByTo {
   "/admin": typeof AdminRoute;
   "/admin/members": typeof AdminMembersRoute;
   "/admin/users": typeof AdminUsersRoute;
+  "/forgot-password": typeof ForgotPasswordRoute;
   "/login": typeof LoginRoute;
   "/mission": typeof MissionRoute;
   "/mission/bag": typeof MissionBagRoute;
   "/mission/play": typeof MissionPlayRoute;
   "/mission/rewards": typeof MissionRewardsRoute;
+  "/reset-password": typeof ResetPasswordRoute;
 }
 
 export interface FileRoutesById {
@@ -99,11 +117,13 @@ export interface FileRoutesById {
   "/admin": typeof AdminRoute;
   "/admin/members": typeof AdminMembersRoute;
   "/admin/users": typeof AdminUsersRoute;
+  "/forgot-password": typeof ForgotPasswordRoute;
   "/login": typeof LoginRoute;
   "/mission": typeof MissionRoute;
   "/mission/bag": typeof MissionBagRoute;
   "/mission/rewards": typeof MissionRewardsRoute;
   "/mission_/play": typeof MissionPlayRoute;
+  "/reset-password": typeof ResetPasswordRoute;
 }
 
 export interface FileRouteTypes {
@@ -113,33 +133,39 @@ export interface FileRouteTypes {
     | "/admin"
     | "/admin/members"
     | "/admin/users"
+    | "/forgot-password"
     | "/login"
     | "/mission"
     | "/mission/bag"
     | "/mission/play"
-    | "/mission/rewards";
+    | "/mission/rewards"
+    | "/reset-password";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
     | "/admin"
     | "/admin/members"
     | "/admin/users"
+    | "/forgot-password"
     | "/login"
     | "/mission"
     | "/mission/bag"
     | "/mission/play"
-    | "/mission/rewards";
+    | "/mission/rewards"
+    | "/reset-password";
   id:
     | "__root__"
     | "/"
     | "/admin"
     | "/admin/members"
     | "/admin/users"
+    | "/forgot-password"
     | "/login"
     | "/mission"
     | "/mission/bag"
     | "/mission/rewards"
-    | "/mission_/play";
+    | "/mission_/play"
+    | "/reset-password";
   fileRoutesById: FileRoutesById;
 }
 
@@ -147,12 +173,14 @@ export interface RootRouteChildren {
   AdminMembersRoute: typeof AdminMembersRoute;
   AdminRoute: typeof AdminRoute;
   AdminUsersRoute: typeof AdminUsersRoute;
+  ForgotPasswordRoute: typeof ForgotPasswordRoute;
   IndexRoute: typeof IndexRoute;
   LoginRoute: typeof LoginRoute;
   MissionRoute: typeof MissionRoute;
   MissionBagRoute: typeof MissionBagRoute;
   MissionPlayRoute: typeof MissionPlayRoute;
   MissionRewardsRoute: typeof MissionRewardsRoute;
+  ResetPasswordRoute: typeof ResetPasswordRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -183,6 +211,20 @@ declare module "@tanstack/react-router" {
       path: "/admin/users";
       fullPath: "/admin/users";
       preLoaderRoute: typeof AdminUsersRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/forgot-password": {
+      id: "/forgot-password";
+      path: "/forgot-password";
+      fullPath: "/forgot-password";
+      preLoaderRoute: typeof ForgotPasswordRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/reset-password": {
+      id: "/reset-password";
+      path: "/reset-password";
+      fullPath: "/reset-password";
+      preLoaderRoute: typeof ResetPasswordRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/mission": {
@@ -227,12 +269,14 @@ const rootRouteChildren: RootRouteChildren = {
   AdminMembersRoute,
   AdminRoute,
   AdminUsersRoute,
+  ForgotPasswordRoute,
   IndexRoute,
   LoginRoute,
   MissionRoute,
   MissionBagRoute,
   MissionPlayRoute,
   MissionRewardsRoute,
+  ResetPasswordRoute,
 };
 
 export const routeTree = rootRouteImport

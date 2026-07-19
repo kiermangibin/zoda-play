@@ -24,6 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getCurrentUser, isAuthenticated, useAuth, userHasAdminAccess } from "@/lib/auth";
+import { formatChartDate, formatTimestamp } from "@/lib/dates";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin")({
@@ -56,13 +57,6 @@ type Profile = {
   role: "user" | "admin";
 };
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
-
 function startOfDay(date: Date) {
   const nextDate = new Date(date);
   nextDate.setHours(0, 0, 0, 0);
@@ -83,6 +77,7 @@ function buildDailyCounts(profiles: Profile[], field: "created_at" | "last_seen_
         const value = new Date(profile[field]);
         return value >= date && value < nextDate;
       }).length,
+      dateLabel: formatChartDate(date),
       label: new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date),
     };
   });
@@ -330,8 +325,8 @@ function AdminPage() {
                           {profile.role}
                         </Badge>
                       </TableCell>
-                      <TableCell>{formatDate(profile.created_at)}</TableCell>
-                      <TableCell>{formatDate(profile.last_seen_at)}</TableCell>
+                      <TableCell>{formatTimestamp(profile.created_at)}</TableCell>
+                      <TableCell>{formatTimestamp(profile.last_seen_at)}</TableCell>
                     </TableRow>
                   ))
                 ) : (
@@ -400,7 +395,7 @@ function RecentProfilesCard({
                       {profile.role}
                     </Badge>
                   </TableCell>
-                  <TableCell>{formatDate(profile[timestampField])}</TableCell>
+                  <TableCell>{formatTimestamp(profile[timestampField])}</TableCell>
                 </TableRow>
               ))
             ) : (
@@ -423,7 +418,7 @@ function AnalyticsCard({
   icon,
   title,
 }: {
-  data: Array<{ count: number; label: string }>;
+  data: Array<{ count: number; dateLabel: string; label: string }>;
   description: string;
   icon: ReactNode;
   title: string;
@@ -452,6 +447,7 @@ function AnalyticsCard({
               <div className="grid gap-0.5 text-center">
                 <span className="text-xs font-semibold text-foreground">{item.count}</span>
                 <span className="text-[10px] uppercase text-muted-foreground">{item.label}</span>
+                <span className="text-[10px] text-muted-foreground">{item.dateLabel}</span>
               </div>
             </div>
           ))}
