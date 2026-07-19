@@ -276,7 +276,7 @@ function AdminUsersPage() {
                   <Label htmlFor="admin-email">Email</Label>
                   <Input
                     id="admin-email"
-                    placeholder="admin@zoda.sg"
+                    placeholder="admin@example.com"
                     type="email"
                     value={adminEmail}
                     onChange={(event) => setAdminEmail(event.target.value)}

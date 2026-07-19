@@ -233,14 +233,14 @@ otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).
 otp_expiry = 3600
 
-# Use Resend SMTP after zoda.sg is verified in Resend.
+# Use Resend SMTP after the final sender domain is verified in Resend.
 # [auth.email.smtp]
 # enabled = true
 # host = "smtp.resend.com"
 # port = 587
 # user = "resend"
 # pass = "env(RESEND_API_KEY)"
-# admin_email = "no-reply@zoda.sg"
+# admin_email = "no-reply@your-confirmed-domain.com"
 # sender_name = "ZODA Mission"
 
 # Uncomment to customize email template
