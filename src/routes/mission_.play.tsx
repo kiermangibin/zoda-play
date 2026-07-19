@@ -182,8 +182,10 @@ function formatScore(value: number) {
 
 function formatRollTime(value: number) {
   return new Intl.DateTimeFormat(undefined, {
+    day: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    month: "short",
   }).format(new Date(value));
 }
 
