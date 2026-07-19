@@ -1,6 +1,14 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { AlertCircle, ShieldCheck, ShieldPlus, Trash2, UserPlus, Users } from "lucide-react";
+import {
+  AlertCircle,
+  ShieldCheck,
+  ShieldMinus,
+  ShieldPlus,
+  Trash2,
+  UserPlus,
+  Users,
+} from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import {
@@ -106,10 +114,12 @@ function AdminUsersPage() {
   const [adminEmail, setAdminEmail] = useState("");
   const [adminName, setAdminName] = useState("");
   const [admins, setAdmins] = useState<AdminRow[]>([]);
+  const [deletingEmail, setDeletingEmail] = useState("");
   const [error, setError] = useState("");
   const [isAddingAdmin, setIsAddingAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [pendingDeleteEmail, setPendingDeleteEmail] = useState("");
   const [pendingRemoveEmail, setPendingRemoveEmail] = useState("");
   const [removingEmail, setRemovingEmail] = useState("");
 
@@ -231,6 +241,38 @@ function AdminUsersPage() {
     setRemovingEmail("");
   }
 
+  async function handleDeleteUser(admin: AdminRow) {
+    if (!supabase) {
+      setMessage("Supabase is not configured.");
+      return;
+    }
+
+    if (currentUser?.email === admin.email || currentUser?.id === admin.profile_id) {
+      setMessage("You cannot delete your own account.");
+      setPendingDeleteEmail("");
+      return;
+    }
+
+    setDeletingEmail(admin.email);
+    setMessage("");
+
+    const { error: deleteError } = await supabase.functions.invoke("delete-user-account", {
+      body: { email: admin.email, userId: admin.profile_id },
+    });
+
+    if (deleteError) {
+      setMessage(await getInviteAdminErrorMessage(deleteError));
+    } else {
+      setMessage(`${admin.email} has been deleted and blocked from signing back in.`);
+      setPendingDeleteEmail("");
+      setPendingRemoveEmail("");
+      await loadAdmins();
+    }
+
+    setDeletingEmail("");
+  }
+
+  const pendingDeleteAdmin = admins.find((admin) => admin.email === pendingDeleteEmail);
   const pendingRemoveAdmin = admins.find((admin) => admin.email === pendingRemoveEmail);
 
   return (
@@ -317,13 +359,14 @@ function AdminUsersPage() {
                     <TableHead>Email</TableHead>
                     <TableHead>Added</TableHead>
                     <TableHead>Last seen</TableHead>
-                    <TableHead className="w-20 text-right">Action</TableHead>
+                    <TableHead className="w-48 text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {admins.length > 0 ? (
                     admins.map((admin) => {
                       const isCurrentUser = currentUser?.email === admin.email;
+                      const isDeleting = deletingEmail === admin.email;
                       const isRemoving = removingEmail === admin.email;
 
                       return (
@@ -335,23 +378,42 @@ function AdminUsersPage() {
                           <TableCell>{formatTimestamp(admin.created_at)}</TableCell>
                           <TableCell>{formatTimestamp(admin.last_seen_at)}</TableCell>
                           <TableCell className="text-right">
-                            <Button
-                              aria-label={
-                                isCurrentUser
-                                  ? "You cannot remove your own admin access"
-                                  : `Remove ${admin.email} admin access`
-                              }
-                              disabled={isCurrentUser || isRemoving}
-                              size="sm"
-                              type="button"
-                              variant={isCurrentUser ? "outline" : "destructive"}
-                              onClick={() => {
-                                if (!isCurrentUser) setPendingRemoveEmail(admin.email);
-                              }}
-                            >
-                              <Trash2 />
-                              {isCurrentUser ? "Self" : "Remove"}
-                            </Button>
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                aria-label={
+                                  isCurrentUser
+                                    ? "You cannot remove your own admin access"
+                                    : `Remove ${admin.email} admin access`
+                                }
+                                disabled={isCurrentUser || isRemoving || isDeleting}
+                                size="sm"
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  if (!isCurrentUser) setPendingRemoveEmail(admin.email);
+                                }}
+                              >
+                                <ShieldMinus />
+                                {isCurrentUser ? "Self" : isRemoving ? "Removing..." : "Demote"}
+                              </Button>
+                              <Button
+                                aria-label={
+                                  isCurrentUser
+                                    ? "You cannot delete your own account"
+                                    : `Delete ${admin.email}`
+                                }
+                                disabled={isCurrentUser || isDeleting || isRemoving}
+                                size="sm"
+                                type="button"
+                                variant={isCurrentUser ? "outline" : "destructive"}
+                                onClick={() => {
+                                  if (!isCurrentUser) setPendingDeleteEmail(admin.email);
+                                }}
+                              >
+                                <Trash2 />
+                                {isCurrentUser ? "Self" : isDeleting ? "Deleting..." : "Delete"}
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
@@ -399,6 +461,40 @@ function AdminUsersPage() {
                 }}
               >
                 {removingEmail ? "Removing..." : "Remove admin"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog
+          open={Boolean(pendingDeleteAdmin)}
+          onOpenChange={(isOpen) => {
+            if (!isOpen && !deletingEmail) setPendingDeleteEmail("");
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this account?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will delete{" "}
+                <span className="font-medium text-foreground">
+                  {pendingDeleteAdmin?.email}
+                </span>{" "}
+                from Supabase Auth, remove their admin access and profile, and block the account
+                from signing back in.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={Boolean(deletingEmail)}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                disabled={Boolean(deletingEmail)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (pendingDeleteAdmin) void handleDeleteUser(pendingDeleteAdmin);
+                }}
+              >
+                {deletingEmail ? "Deleting..." : "Delete account"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -64,6 +64,11 @@ function toAuthUser(user: {
 async function syncUserProfile(user: AuthUser) {
   if (!supabase || !user.email) return;
 
+  if (await currentUserIsDeleted()) {
+    await supabase.auth.signOut();
+    return;
+  }
+
   await supabase.from("profiles").upsert(
     {
       email: user.email,
@@ -82,11 +87,28 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return user ? toAuthUser(user) : null;
+  if (!user) return null;
+
+  if (await currentUserIsDeleted()) {
+    await supabase.auth.signOut();
+    return null;
+  }
+
+  return toAuthUser(user);
 }
 
 export async function isAuthenticated() {
   return Boolean(await getCurrentUser());
+}
+
+export async function currentUserIsDeleted() {
+  if (!supabase) return false;
+
+  const { data, error } = await supabase.rpc("current_user_is_deleted");
+
+  if (error) return false;
+
+  return Boolean(data);
 }
 
 export async function userHasAdminAccess(email: string | null | undefined) {
@@ -144,8 +166,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     supabase.auth.getUser().then(({ data }) => {
       const nextUser = data.user ? toAuthUser(data.user) : null;
-      setCurrentUser(nextUser);
-      if (nextUser) void syncUserProfile(nextUser);
+      if (!nextUser) {
+        setCurrentUser(null);
+        return;
+      }
+
+      currentUserIsDeleted().then((isDeleted) => {
+        if (isDeleted) {
+          void supabase.auth.signOut();
+          setCurrentUser(null);
+          return;
+        }
+
+        setCurrentUser(nextUser);
+        void syncUserProfile(nextUser);
+      });
     });
 
     const {
@@ -158,6 +193,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!supabase || !currentUser) return;
+
+    const interval = window.setInterval(() => {
+      currentUserIsDeleted().then((isDeleted) => {
+        if (!isDeleted) return;
+
+        void supabase.auth.signOut();
+        setCurrentUser(null);
+        setIsAdmin(false);
+      });
+    }, 30000);
+
+    return () => window.clearInterval(interval);
+  }, [currentUser]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -188,6 +239,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (error) throw new Error(getSupabaseAuthErrorMessage(error.message));
         if (data.user) {
+          if (await currentUserIsDeleted()) {
+            await client.auth.signOut();
+            throw new Error("This account has been deleted.");
+          }
+
           const nextUser = toAuthUser(data.user);
           setCurrentUser(nextUser);
           await syncUserProfile(nextUser);
