@@ -26,7 +26,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getCurrentUser, isAuthenticated, useAuth, userHasAdminAccess } from "@/lib/auth";
+import {
+  getCurrentUser,
+  getSupabaseAuthErrorMessage,
+  isAuthenticated,
+  useAuth,
+  userHasAdminAccess,
+} from "@/lib/auth";
 import { formatTimestamp } from "@/lib/dates";
 import { supabase } from "@/lib/supabase";
 
@@ -75,7 +81,7 @@ function getAdminActionErrorMessage(message: string) {
     return "Your app session has admin access, but Supabase has not synced server-side admin access yet. Apply the latest Supabase migration, then sign out and back in.";
   }
 
-  return message;
+  return getSupabaseAuthErrorMessage(message);
 }
 
 async function getInviteAdminErrorMessage(error: Error) {

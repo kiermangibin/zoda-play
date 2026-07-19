@@ -31,6 +31,16 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
+export function getSupabaseAuthErrorMessage(message: string) {
+  const normalizedMessage = message.toLowerCase();
+
+  if (normalizedMessage.includes("email rate limit")) {
+    return "Supabase email limit reached. Wait about an hour before sending another email, or connect custom SMTP in Supabase to raise the limit.";
+  }
+
+  return message;
+}
+
 function toAuthUser(user: {
   email?: string | null;
   id: string;
@@ -166,7 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           redirectTo: `${window.location.origin}/reset-password`,
         });
 
-        if (error) throw new Error(error.message);
+        if (error) throw new Error(getSupabaseAuthErrorMessage(error.message));
       },
       signIn: async (email, password) => {
         const normalizedEmail = normalizeEmail(email);
@@ -176,7 +186,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           password,
         });
 
-        if (error) throw new Error(error.message);
+        if (error) throw new Error(getSupabaseAuthErrorMessage(error.message));
         if (data.user) {
           const nextUser = toAuthUser(data.user);
           setCurrentUser(nextUser);
