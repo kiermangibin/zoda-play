@@ -200,14 +200,6 @@ Deno.serve(async (request) => {
     });
   }
 
-  const { error: insertError } = await supabase
-    .from("admin_emails")
-    .upsert({ email }, { onConflict: "email" });
-
-  if (insertError) {
-    return jsonResponse({ error: insertError.message }, 500);
-  }
-
   if (existingUser) {
     const profileName = getUserName(existingUser, name, email);
     const { error: profileError } = await supabase.from("profiles").upsert(
@@ -223,6 +215,14 @@ Deno.serve(async (request) => {
 
     if (profileError) {
       return jsonResponse({ error: profileError.message }, 500);
+    }
+
+    const { error: insertError } = await supabase
+      .from("admin_emails")
+      .upsert({ email }, { onConflict: "email" });
+
+    if (insertError) {
+      return jsonResponse({ error: insertError.message }, 500);
     }
 
     return jsonResponse({
@@ -245,6 +245,14 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: profileError.message }, 500);
     }
 
+    const { error: insertError } = await supabase
+      .from("admin_emails")
+      .upsert({ email }, { onConflict: "email" });
+
+    if (insertError) {
+      return jsonResponse({ error: insertError.message }, 500);
+    }
+
     return jsonResponse({
       action: "promoted",
       email,
@@ -262,6 +270,14 @@ Deno.serve(async (request) => {
 
   if (inviteError) {
     return jsonResponse({ error: inviteError.message }, 400);
+  }
+
+  const { error: insertError } = await supabase
+    .from("admin_emails")
+    .upsert({ email }, { onConflict: "email" });
+
+  if (insertError) {
+    return jsonResponse({ error: insertError.message }, 500);
   }
 
   return jsonResponse({
