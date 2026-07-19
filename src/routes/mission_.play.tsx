@@ -186,6 +186,7 @@ function formatRollTime(value: number) {
     hour: "numeric",
     minute: "2-digit",
     month: "short",
+    weekday: "short",
   }).format(new Date(value));
 }
 
