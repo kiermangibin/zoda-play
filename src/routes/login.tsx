@@ -1,8 +1,8 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useState } from "react";
 import { Link, createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
 import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
 
-import { isAuthenticated, useAuth } from "@/lib/auth";
+import { getCurrentUser, userHasAdminAccess, useAuth } from "@/lib/auth";
 import zodaZLogo from "@/assets/zoda-Z.png";
 import "@/styles/auth.css";
 
@@ -10,15 +10,20 @@ type LoginSearch = {
   redirect?: string;
 };
 
-function getSafeRedirect(value: string | undefined) {
-  return value?.startsWith("/") ? value : "/mission";
+function getSafeRedirect(value: string | undefined, fallback = "/mission") {
+  return value?.startsWith("/") && !value.startsWith("//") ? value : fallback;
 }
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async ({ search }) => {
-    const redirectTo = getSafeRedirect(typeof search.redirect === "string" ? search.redirect : undefined);
+    const currentUser = await getCurrentUser();
 
-    if (await isAuthenticated()) {
+    if (currentUser) {
+      const fallback = (await userHasAdminAccess(currentUser.email)) ? "/admin" : "/mission";
+      const redirectTo = getSafeRedirect(
+        typeof search.redirect === "string" ? search.redirect : undefined,
+        fallback,
+      );
       throw redirect({ to: redirectTo });
     }
   },
@@ -41,7 +46,6 @@ function LoginPage() {
   const auth = useAuth();
   const navigate = useNavigate();
   const search = useSearch({ from: "/login" });
-  const redirectTo = useMemo(() => getSafeRedirect(search.redirect), [search.redirect]);
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -73,7 +77,8 @@ function LoginPage() {
         await auth.signIn(email, password);
       }
 
-      await navigate({ to: redirectTo, replace: true });
+      const fallback = (await userHasAdminAccess(email)) ? "/admin" : "/mission";
+      await navigate({ to: getSafeRedirect(search.redirect, fallback), replace: true });
     } catch (nextError) {
       setError(nextError instanceof Error ? nextError.message : "Something went wrong.");
     } finally {

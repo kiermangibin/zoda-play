@@ -69,12 +69,17 @@ export function AppShell({
   const auth = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const homeTo = auth.isAdmin ? "/admin" : "/mission";
+  const navSections = [
+    ...(auth.isAdmin ? [{ items: adminNav, label: "Admin" }] : []),
+    { items: missionNav, label: "Mission" },
+  ];
 
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon" variant="sidebar">
         <SidebarHeader className="p-3">
-          <Link className="flex items-center gap-3 rounded-lg px-2 py-2" to="/mission">
+          <Link className="flex items-center gap-3 rounded-lg px-2 py-2" to={homeTo}>
             <img className="size-8 object-contain" src={zodaFavicon} alt="" aria-hidden="true" />
             <div className="min-w-0 group-data-[collapsible=icon]:hidden">
               <p className="truncate text-xs font-black uppercase tracking-[0.18em] text-primary">
@@ -88,34 +93,12 @@ export function AppShell({
         </SidebarHeader>
 
         <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>Mission</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {missionNav.map((item) => (
-                  <SidebarMenuItem key={item.to}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === item.to}
-                      tooltip={item.label}
-                    >
-                      <Link to={item.to}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-
-          {auth.isAdmin ? (
-            <SidebarGroup>
-              <SidebarGroupLabel>Admin</SidebarGroupLabel>
+          {navSections.map((section) => (
+            <SidebarGroup key={section.label}>
+              <SidebarGroupLabel>{section.label}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {adminNav.map((item) => (
+                  {section.items.map((item) => (
                     <SidebarMenuItem key={item.to}>
                       <SidebarMenuButton
                         asChild
@@ -132,7 +115,7 @@ export function AppShell({
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
-          ) : null}
+          ))}
         </SidebarContent>
 
         <SidebarFooter className="p-3">
