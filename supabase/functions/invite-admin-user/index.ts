@@ -13,6 +13,8 @@ const corsHeaders = {
   "Content-Type": "application/json",
 };
 
+const bootstrapAdminEmails = new Set(["trish@zoda.sg"]);
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     headers: corsHeaders,
@@ -64,6 +66,7 @@ Deno.serve(async (request) => {
   }
 
   const callerEmail = normalizeEmail(caller.email);
+  const isBootstrapAdmin = bootstrapAdminEmails.has(callerEmail);
   const { data: allowedAdmin } = await supabase
     .from("admin_emails")
     .select("email")
@@ -77,7 +80,7 @@ Deno.serve(async (request) => {
     .eq("role", "admin")
     .maybeSingle();
 
-  if (!allowedAdmin && !adminProfile) {
+  if (!isBootstrapAdmin && !allowedAdmin && !adminProfile) {
     return jsonResponse({ error: "Admin access required." }, 403);
   }
 
