@@ -260,7 +260,7 @@ function AdminPage() {
   );
 
   return (
-    <AppShell eyebrow="Admin" title="Analytics">
+    <AppShell eyebrow="Admin" title="Track">
       <main className="mx-auto grid w-full max-w-6xl gap-6 p-4 md:p-6">
         <section className="grid gap-4 md:grid-cols-5">
           <Card>

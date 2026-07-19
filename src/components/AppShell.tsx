@@ -43,7 +43,7 @@ const missionNav = [
 ];
 
 const adminNav = [
-  { icon: BarChart3, label: "Analytics", to: "/admin" },
+  { icon: BarChart3, label: "Track", to: "/admin" },
   { icon: Users, label: "Users", to: "/admin/members" },
   { icon: UserCog, label: "Admins", to: "/admin/users" },
 ];
