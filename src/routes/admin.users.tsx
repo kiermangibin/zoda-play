@@ -72,7 +72,7 @@ function normalizeEmail(email: string) {
 
 function getAdminActionErrorMessage(message: string) {
   if (message.toLowerCase().includes("admin access required")) {
-    return "Your app session has admin access, but Supabase has not synced your admin row yet. Apply supabase/migrations/003_bootstrap_admin_access.sql, then sign out and back in.";
+    return "Your app session has admin access, but Supabase has not synced server-side admin access yet. Apply the latest Supabase migration, then sign out and back in.";
   }
 
   return message;
@@ -245,8 +245,8 @@ function AdminUsersPage() {
           </Card>
         ) : null}
 
-        <section className="grid gap-4 lg:grid-cols-[360px_1fr]">
-          <Card>
+        <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
+          <Card className="min-w-0">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShieldPlus className="size-4 text-primary" />
@@ -280,12 +280,16 @@ function AdminUsersPage() {
                   <UserPlus />
                   {isAddingAdmin ? "Sending..." : "Send invite"}
                 </Button>
-                {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
+                {message ? (
+                  <p className="max-w-full whitespace-normal text-sm leading-relaxed text-muted-foreground [overflow-wrap:anywhere]">
+                    {message}
+                  </p>
+                ) : null}
               </form>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="min-w-0">
             <CardHeader className="flex-row items-center justify-between gap-4">
               <div>
                 <CardTitle className="flex items-center gap-2">
