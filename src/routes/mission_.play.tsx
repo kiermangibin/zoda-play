@@ -3,7 +3,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { ArrowLeft, BookOpen, Check, Dice5, RotateCcw, Trophy, X } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
-import { isAuthenticated } from "@/lib/auth";
+import { isAuthenticated, useAuth } from "@/lib/auth";
 import {
   MISSION_DICE_STORAGE_KEY,
   MISSION_FINAL_STORAGE_KEY,
@@ -18,6 +18,7 @@ import {
   writeMissionJson,
   writeMissionString,
 } from "@/lib/mission-progress";
+import { supabase } from "@/lib/supabase";
 import ascenderTrophy from "@/assets/ascender-trophy.png";
 import beastTrophy from "@/assets/finisher-trophy.png";
 import finalMissionIcon from "@/assets/Final Mission.png";
@@ -311,7 +312,9 @@ function getPlayWinRules(scoreboard: ReturnType<typeof getScoreboard>, finalMiss
 }
 
 export function MissionPlayPage({ embedded = false }: { embedded?: boolean } = {}) {
+  const { currentUser } = useAuth();
   const hasLoadedProgress = useRef(false);
+  const hasSyncedSavedProgress = useRef(false);
   const [challengeResults, setChallengeResults] = useState<ChallengeResults>({});
   const [activeWeekIndex, setActiveWeekIndex] = useState(0);
   const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
@@ -419,6 +422,20 @@ export function MissionPlayPage({ embedded = false }: { embedded?: boolean } = {
   }, [activeWeekIndex, unlockedWeekIndex]);
 
   useEffect(() => {
+    if (!hasLoadedProgress.current || hasSyncedSavedProgress.current || !currentUser) return;
+
+    hasSyncedSavedProgress.current = true;
+    ALL_CHALLENGES.forEach((challenge) => {
+      const result = challengeResults[getChallengeResultKey(challenge)];
+      if (result) void trackMissionResult({ challenge, result });
+    });
+
+    if (finalMissionComplete) {
+      void trackFinalMissionComplete();
+    }
+  }, [challengeResults, currentUser, finalMissionComplete]);
+
+  useEffect(() => {
     if (!scoreNotice) return;
 
     const timeoutId = window.setTimeout(() => setScoreNotice(null), 3200);
@@ -499,6 +516,55 @@ export function MissionPlayPage({ embedded = false }: { embedded?: boolean } = {
     );
   };
 
+  const trackMissionResult = async ({
+    challenge,
+    result,
+  }: {
+    challenge: MissionChallenge;
+    result: MissionResult;
+  }) => {
+    if (!supabase || !currentUser) return;
+
+    await supabase.from("mission_challenge_results").upsert(
+      {
+        challenge_id: challenge.id,
+        challenge_name: challenge.name,
+        completed_at: new Date().toISOString(),
+        points:
+          result === "hit"
+            ? getPointValue(challenge.points)
+            : getPointValue(challenge.points) / 2,
+        result,
+        updated_at: new Date().toISOString(),
+        user_email: currentUser.email,
+        user_id: currentUser.id,
+        user_name: currentUser.name,
+        week_label: challenge.badge,
+      },
+      { onConflict: "user_id,challenge_id" },
+    );
+  };
+
+  const trackFinalMissionComplete = async () => {
+    if (!supabase || !currentUser) return;
+
+    await supabase.from("mission_challenge_results").upsert(
+      {
+        challenge_id: FINAL_MISSION_ID,
+        challenge_name: "Final Mission",
+        completed_at: new Date().toISOString(),
+        points: 0,
+        result: "final",
+        updated_at: new Date().toISOString(),
+        user_email: currentUser.email,
+        user_id: currentUser.id,
+        user_name: currentUser.name,
+        week_label: "Final",
+      },
+      { onConflict: "user_id,challenge_id" },
+    );
+  };
+
   const markActiveChallengeResult = (result: MissionResult) => {
     if (!activeChallenge || activeChallengeIsComplete) return;
     const nextResults = {
@@ -530,6 +596,7 @@ export function MissionPlayPage({ embedded = false }: { embedded?: boolean } = {
       });
     }
     saveChallengeResults(nextResults);
+    void trackMissionResult({ challenge: activeChallenge, result });
   };
 
   const markFinalMissionComplete = () => {
@@ -546,6 +613,7 @@ export function MissionPlayPage({ embedded = false }: { embedded?: boolean } = {
 
     setFinalMissionComplete(true);
     writeMissionString(MISSION_FINAL_STORAGE_KEY, "true");
+    void trackFinalMissionComplete();
     setLockedWeekNotice(null);
     setScoreNotice(null);
     setIsRulebookOpen(false);

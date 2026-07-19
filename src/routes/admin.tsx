@@ -3,13 +3,18 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import {
   Activity,
   AlertCircle,
+  BarChart3,
   CalendarPlus,
+  CheckCircle2,
   Clock,
   Moon,
   ShieldCheck,
   Sparkles,
+  Target,
   TrendingUp,
+  Trophy,
   Users,
+  XCircle,
 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
@@ -57,6 +62,18 @@ type Profile = {
   role: "user" | "admin";
 };
 
+type MissionResult = {
+  challenge_id: string;
+  challenge_name: string;
+  completed_at: string;
+  id: string;
+  points: number;
+  result: "hit" | "fail" | "final";
+  user_email: string;
+  user_name: string;
+  week_label: string;
+};
+
 function startOfDay(date: Date) {
   const nextDate = new Date(date);
   nextDate.setHours(0, 0, 0, 0);
@@ -83,29 +100,82 @@ function buildDailyCounts(profiles: Profile[], field: "created_at" | "last_seen_
   });
 }
 
+function buildWeeklyOutcomes(results: MissionResult[]) {
+  const today = startOfDay(new Date());
+
+  return Array.from({ length: 6 }, (_, index) => {
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - (5 - index) * 7);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 7);
+    const weekResults = results.filter((result) => {
+      const completedAt = new Date(result.completed_at);
+      return completedAt >= weekStart && completedAt < weekEnd;
+    });
+
+    return {
+      fail: weekResults.filter((result) => result.result === "fail").length,
+      final: weekResults.filter((result) => result.result === "final").length,
+      hit: weekResults.filter((result) => result.result === "hit").length,
+      label: formatChartDate(weekStart),
+    };
+  });
+}
+
+function buildWeekCompletion(results: MissionResult[]) {
+  const weekOrder = ["Week 1", "Week 2", "Week 3", "Final"];
+
+  return weekOrder.map((week) => {
+    const weekResults = results.filter((result) => result.week_label === week);
+
+    return {
+      fail: weekResults.filter((result) => result.result === "fail").length,
+      final: weekResults.filter((result) => result.result === "final").length,
+      hit: weekResults.filter((result) => result.result === "hit").length,
+      label: week.replace("Week ", "W"),
+      total: weekResults.length,
+    };
+  });
+}
+
 function AdminPage() {
   useAuth();
+  const [missionResults, setMissionResults] = useState<MissionResult[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function loadProfiles() {
+  async function loadAdminData() {
     if (!supabase) {
       setError("Supabase is not configured.");
       setIsLoading(false);
       return;
     }
 
-    const { data, error: queryError } = await supabase
-      .from("profiles")
-      .select("id,email,name,role,created_at,last_seen_at")
-      .order("last_seen_at", { ascending: false });
+    const [
+      { data: profileRows, error: profileError },
+      { data: resultRows, error: resultError },
+    ] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("id,email,name,role,created_at,last_seen_at")
+        .order("last_seen_at", { ascending: false }),
+      supabase
+        .from("mission_challenge_results")
+        .select(
+          "id,user_email,user_name,challenge_id,challenge_name,week_label,result,points,completed_at",
+        )
+        .order("completed_at", { ascending: false })
+        .limit(500),
+    ]);
 
-    if (queryError) {
-      setError(queryError.message);
+    if (profileError || resultError) {
+      setError(profileError?.message ?? resultError?.message ?? "Unable to load admin data.");
       setProfiles([]);
+      setMissionResults([]);
     } else {
-      setProfiles(data ?? []);
+      setProfiles(profileRows ?? []);
+      setMissionResults((resultRows ?? []) as MissionResult[]);
       setError("");
     }
 
@@ -113,7 +183,7 @@ function AdminPage() {
   }
 
   useEffect(() => {
-    void loadProfiles();
+    void loadAdminData();
   }, []);
 
   const stats = useMemo(() => {
@@ -149,8 +219,31 @@ function AdminPage() {
     };
   }, [profiles]);
 
+  const missionStats = useMemo(() => {
+    const hits = missionResults.filter((result) => result.result === "hit").length;
+    const fails = missionResults.filter((result) => result.result === "fail").length;
+    const finals = missionResults.filter((result) => result.result === "final").length;
+    const attempts = hits + fails;
+    const activePlayers = new Set(missionResults.map((result) => result.user_email)).size;
+
+    return {
+      activePlayers,
+      attempts,
+      fails,
+      finals,
+      hitRate: attempts ? Math.round((hits / attempts) * 100) : 0,
+      hits,
+      points: Math.round(
+        missionResults.reduce((total, result) => total + Number(result.points), 0),
+      ),
+    };
+  }, [missionResults]);
+
   const dailyActive = useMemo(() => buildDailyCounts(profiles, "last_seen_at"), [profiles]);
   const dailySignups = useMemo(() => buildDailyCounts(profiles, "created_at"), [profiles]);
+  const weeklyOutcomes = useMemo(() => buildWeeklyOutcomes(missionResults), [missionResults]);
+  const weekCompletion = useMemo(() => buildWeekCompletion(missionResults), [missionResults]);
+  const recentMissionResults = useMemo(() => missionResults.slice(0, 8), [missionResults]);
   const recentActive = useMemo(
     () =>
       [...profiles]
@@ -238,6 +331,52 @@ function AdminPage() {
           </Card>
         </section>
 
+        <section className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <CardHeader>
+              <CardDescription className="flex items-center gap-2">
+                <CheckCircle2 className="size-3.5 text-primary" />
+                Successful hits
+              </CardDescription>
+              <CardTitle className="text-3xl">{isLoading ? "-" : missionStats.hits}</CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardDescription className="flex items-center gap-2">
+                <XCircle className="size-3.5 text-destructive" />
+                Failed attempts
+              </CardDescription>
+              <CardTitle className="text-3xl">{isLoading ? "-" : missionStats.fails}</CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardDescription className="flex items-center gap-2">
+                <Target className="size-3.5 text-primary" />
+                Hit rate
+              </CardDescription>
+              <CardTitle className="text-3xl">
+                {isLoading ? "-" : `${missionStats.hitRate}%`}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardDescription className="flex items-center gap-2">
+                <Trophy className="size-3.5 text-primary" />
+                Final complete
+              </CardDescription>
+              <CardTitle className="text-3xl">{isLoading ? "-" : missionStats.finals}</CardTitle>
+              <CardDescription>
+                {isLoading
+                  ? "Players and points"
+                  : `${missionStats.activePlayers} players · ${missionStats.points} pts`}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </section>
+
         {error ? (
           <Card className="border-destructive/40 bg-destructive/10">
             <CardHeader>
@@ -269,6 +408,21 @@ function AdminPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
+          <OutcomeTrendCard
+            data={weeklyOutcomes}
+            description="Hit, fail and final-complete results grouped by week."
+            icon={<BarChart3 className="size-4 text-primary" />}
+            title="Weekly outcomes"
+          />
+          <WeekCompletionCard
+            data={weekCompletion}
+            description="All recorded completions by mission week."
+            icon={<Target className="size-4 text-primary" />}
+            title="Completion by week"
+          />
+        </section>
+
+        <section className="grid gap-4 lg:grid-cols-2">
           <RecentProfilesCard
             description="Newest profile rows created in Supabase."
             emptyLabel={isLoading ? "Loading signups..." : "No signups yet."}
@@ -288,6 +442,11 @@ function AdminPage() {
             title="Recently active"
           />
         </section>
+
+        <RecentMissionResultsCard
+          emptyLabel={isLoading ? "Loading mission results..." : "No mission results yet."}
+          results={recentMissionResults}
+        />
 
         <Card>
           <CardHeader className="flex-row items-center justify-between gap-4">
@@ -452,6 +611,200 @@ function AnalyticsCard({
             </div>
           ))}
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function OutcomeTrendCard({
+  data,
+  description,
+  icon,
+  title,
+}: {
+  data: Array<{ fail: number; final: number; hit: number; label: string }>;
+  description: string;
+  icon: ReactNode;
+  title: string;
+}) {
+  const max = Math.max(...data.map((item) => item.hit + item.fail + item.final), 1);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          {icon}
+          {title}
+        </CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <i className="size-2 rounded-full bg-primary" aria-hidden="true" />
+            Hit
+          </span>
+          <span className="flex items-center gap-1.5">
+            <i className="size-2 rounded-full bg-destructive" aria-hidden="true" />
+            Fail
+          </span>
+          <span className="flex items-center gap-1.5">
+            <i className="size-2 rounded-full bg-foreground" aria-hidden="true" />
+            Final
+          </span>
+        </div>
+        <div className="flex h-44 items-end gap-2">
+          {data.map((item) => {
+            const total = item.hit + item.fail + item.final;
+
+            return (
+              <div className="flex min-w-0 flex-1 flex-col items-center gap-2" key={item.label}>
+                <div className="flex h-32 w-full flex-col justify-end overflow-hidden rounded bg-muted/60">
+                  <div
+                    className="w-full bg-foreground"
+                    style={{ height: `${total ? (item.final / max) * 100 : 0}%` }}
+                  />
+                  <div
+                    className="w-full bg-destructive"
+                    style={{ height: `${total ? (item.fail / max) * 100 : 0}%` }}
+                  />
+                  <div
+                    className="w-full bg-primary"
+                    style={{ height: `${total ? (item.hit / max) * 100 : 0}%` }}
+                  />
+                </div>
+                <div className="grid gap-0.5 text-center">
+                  <span className="text-xs font-semibold text-foreground">{total}</span>
+                  <span className="text-[10px] text-muted-foreground">{item.label}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function WeekCompletionCard({
+  data,
+  description,
+  icon,
+  title,
+}: {
+  data: Array<{ fail: number; final: number; hit: number; label: string; total: number }>;
+  description: string;
+  icon: ReactNode;
+  title: string;
+}) {
+  const max = Math.max(...data.map((item) => item.total), 1);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          {icon}
+          {title}
+        </CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid gap-4">
+          {data.map((item) => (
+            <div className="grid gap-2" key={item.label}>
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <span className="font-medium">{item.label}</span>
+                <span className="text-muted-foreground">
+                  {item.total} done
+                  {item.fail ? ` · ${item.fail} fail` : ""}
+                </span>
+              </div>
+              <div className="h-3 overflow-hidden rounded bg-muted">
+                <div
+                  className="h-full rounded bg-primary"
+                  style={{ width: `${Math.max((item.total / max) * 100, item.total ? 6 : 0)}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function RecentMissionResultsCard({
+  emptyLabel,
+  results,
+}: {
+  emptyLabel: string;
+  results: MissionResult[];
+}) {
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between gap-4">
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle2 className="size-4 text-primary" />
+            Recent mission results
+          </CardTitle>
+          <CardDescription>Latest hits, fails and final completions by user.</CardDescription>
+        </div>
+        <Badge variant="secondary">{results.length} shown</Badge>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>User</TableHead>
+              <TableHead>Challenge</TableHead>
+              <TableHead>Result</TableHead>
+              <TableHead>Points</TableHead>
+              <TableHead>Completed</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {results.length > 0 ? (
+              results.map((result) => (
+                <TableRow key={result.id}>
+                  <TableCell>
+                    <div className="grid gap-1">
+                      <span className="font-medium">{result.user_name}</span>
+                      <span className="text-xs text-muted-foreground">{result.user_email}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="grid gap-1">
+                      <span>{result.challenge_name}</span>
+                      <span className="text-xs text-muted-foreground">{result.week_label}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        result.result === "fail"
+                          ? "destructive"
+                          : result.result === "final"
+                            ? "default"
+                            : "secondary"
+                      }
+                    >
+                      {result.result === "final" ? "final" : result.result}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{Number(result.points)}</TableCell>
+                  <TableCell>{formatTimestamp(result.completed_at)}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell className="text-muted-foreground" colSpan={5}>
+                  {emptyLabel}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );
