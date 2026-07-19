@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:supabase-admin": "node scripts/check-supabase-admin-functions.mjs",
+    "check": "npm run check:supabase-admin && npm run build"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",
