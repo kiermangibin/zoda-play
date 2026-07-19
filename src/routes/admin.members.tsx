@@ -161,18 +161,24 @@ function AdminMembersPage() {
     setMessage("");
     setUpdatingEmail(profile.email);
 
-    const { error: updateError } =
+    const { data, error: updateError } =
       profile.role === "admin"
         ? await supabase.rpc("remove_admin_user", { admin_email: profile.email })
-        : await supabase.rpc("add_admin_user", { admin_email: profile.email });
+        : await supabase.functions.invoke<{ message?: string }>("invite-admin-user", {
+            body: { email: profile.email, name: profile.name },
+          });
 
     if (updateError) {
-      setMessage(getAdminActionErrorMessage(updateError.message));
+      setMessage(
+        profile.role === "admin"
+          ? getAdminActionErrorMessage(updateError.message)
+          : await getFunctionErrorMessage(updateError),
+      );
     } else {
       setMessage(
         profile.role === "admin"
           ? `${profile.email} is now a user.`
-          : `${profile.email} is now an admin.`,
+          : data?.message ?? `${profile.email} is now an admin.`,
       );
       await loadProfiles();
     }

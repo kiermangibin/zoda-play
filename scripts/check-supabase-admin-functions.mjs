@@ -42,6 +42,25 @@ for (const [name, definition] of functions) {
 }
 
 const removeAdmin = functions.get("remove_admin_user");
+const addAdmin = functions.get("add_admin_user");
+
+if (!addAdmin) {
+  failures.push("Missing public.add_admin_user RPC definition.");
+} else {
+  const requiredSnippets = [
+    "public.current_user_is_admin()",
+    "on conflict on constraint admin_emails_pkey do nothing",
+    "where profile.email = normalized_email",
+  ];
+
+  for (const snippet of requiredSnippets) {
+    if (!addAdmin.body.includes(snippet)) {
+      failures.push(
+        `${addAdmin.file}: public.add_admin_user is missing required guard: ${snippet}`,
+      );
+    }
+  }
+}
 
 if (!removeAdmin) {
   failures.push("Missing public.remove_admin_user RPC definition.");
