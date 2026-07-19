@@ -60,6 +60,14 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
+function getAdminActionErrorMessage(message: string) {
+  if (message.toLowerCase().includes("admin access required")) {
+    return "Your app session has admin access, but Supabase has not synced your admin row yet. Apply supabase/migrations/003_bootstrap_admin_access.sql, then sign out and back in.";
+  }
+
+  return message;
+}
+
 function AdminUsersPage() {
   const { currentUser } = useAuth();
   const [adminEmail, setAdminEmail] = useState("");
@@ -141,7 +149,7 @@ function AdminUsersPage() {
     });
 
     if (addError) {
-      setMessage(addError.message);
+      setMessage(getAdminActionErrorMessage(addError.message));
     } else {
       setAdminEmail("");
       setMessage(`${email} is now an admin.`);
@@ -165,7 +173,7 @@ function AdminUsersPage() {
     });
 
     if (removeError) {
-      setMessage(removeError.message);
+      setMessage(getAdminActionErrorMessage(removeError.message));
     } else {
       setMessage(`${email} is no longer an admin.`);
       setPendingRemoveEmail("");
