@@ -6,6 +6,17 @@ type InviteAdminRequest = {
   name?: unknown;
 };
 
+type AuthUser = {
+  email?: string;
+  invited_at?: string | null;
+  last_sign_in_at?: string | null;
+  id: string;
+  user_metadata?: {
+    name?: unknown;
+    full_name?: unknown;
+  };
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -24,6 +35,42 @@ function jsonResponse(body: unknown, status = 200) {
 
 function normalizeEmail(value: string) {
   return value.trim().toLowerCase();
+}
+
+function getUserName(user: AuthUser | null, fallbackName: string, fallbackEmail: string) {
+  const metadataName =
+    typeof user?.user_metadata?.name === "string"
+      ? user.user_metadata.name
+      : typeof user?.user_metadata?.full_name === "string"
+        ? user.user_metadata.full_name
+        : "";
+
+  return metadataName || fallbackName || fallbackEmail.split("@")[0] || "Mission Player";
+}
+
+function isUnfinishedInvite(user: AuthUser | null) {
+  return Boolean(user?.invited_at && !user.last_sign_in_at);
+}
+
+async function findUserByEmail(
+  supabase: ReturnType<typeof createClient>,
+  email: string,
+): Promise<AuthUser | null> {
+  for (let page = 1; page <= 20; page += 1) {
+    const { data, error } = await supabase.auth.admin.listUsers({
+      page,
+      perPage: 1000,
+    });
+
+    if (error) throw error;
+
+    const users = data.users as AuthUser[];
+    const user = users.find((candidate) => normalizeEmail(candidate.email ?? "") === email);
+    if (user) return user;
+    if (users.length < 1000) return null;
+  }
+
+  return null;
 }
 
 Deno.serve(async (request) => {
@@ -105,6 +152,54 @@ Deno.serve(async (request) => {
   const origin = request.headers.get("Origin") ?? "https://mission-play.vercel.app";
   const redirectTo = `${origin}/reset-password`;
 
+  const { data: existingAdmin } = await supabase
+    .from("admin_emails")
+    .select("email")
+    .eq("email", email)
+    .maybeSingle();
+
+  const { data: existingProfile, error: existingProfileError } = await supabase
+    .from("profiles")
+    .select("id,email,name,role,last_seen_at")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (existingProfileError) {
+    return jsonResponse({ error: existingProfileError.message }, 500);
+  }
+
+  let existingUser: AuthUser | null = null;
+  try {
+    existingUser = await findUserByEmail(supabase, email);
+  } catch (error) {
+    return jsonResponse(
+      { error: error instanceof Error ? error.message : "Unable to check existing users." },
+      500,
+    );
+  }
+
+  if (existingAdmin && existingProfile?.role === "admin") {
+    return jsonResponse({
+      action: "already_admin",
+      email,
+      invited: false,
+      message: `${email} is already an admin.`,
+      name: existingProfile?.name ?? getUserName(existingUser, name, email),
+      userId: existingProfile?.id ?? existingUser?.id ?? null,
+    });
+  }
+
+  if (existingAdmin && existingUser && !existingProfile && isUnfinishedInvite(existingUser)) {
+    return jsonResponse({
+      action: "already_invited",
+      email,
+      invited: false,
+      message: `${email} already has an admin invite pending. No duplicate invite email was sent.`,
+      name: getUserName(existingUser, name, email),
+      userId: existingUser.id,
+    });
+  }
+
   const { error: insertError } = await supabase
     .from("admin_emails")
     .upsert({ email }, { onConflict: "email" });
@@ -113,13 +208,51 @@ Deno.serve(async (request) => {
     return jsonResponse({ error: insertError.message }, 500);
   }
 
-  const { error: profileError } = await supabase
-    .from("profiles")
-    .update({ name, role: "admin" })
-    .eq("email", email);
+  if (existingUser) {
+    const profileName = getUserName(existingUser, name, email);
+    const { error: profileError } = await supabase.from("profiles").upsert(
+      {
+        email,
+        id: existingUser.id,
+        last_seen_at: new Date().toISOString(),
+        name: profileName,
+        role: "admin",
+      },
+      { onConflict: "id" },
+    );
 
-  if (profileError) {
-    return jsonResponse({ error: profileError.message }, 500);
+    if (profileError) {
+      return jsonResponse({ error: profileError.message }, 500);
+    }
+
+    return jsonResponse({
+      action: "promoted",
+      email,
+      invited: false,
+      message: `${email} is now an admin. No invite email was sent because they already have an account.`,
+      name: profileName,
+      userId: existingUser.id,
+    });
+  }
+
+  if (existingProfile) {
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update({ name, role: "admin" })
+      .eq("email", email);
+
+    if (profileError) {
+      return jsonResponse({ error: profileError.message }, 500);
+    }
+
+    return jsonResponse({
+      action: "promoted",
+      email,
+      invited: false,
+      message: `${email} is now an admin. No invite email was sent because they already have a user profile.`,
+      name,
+      userId: existingProfile.id,
+    });
   }
 
   const { data, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
@@ -132,8 +265,10 @@ Deno.serve(async (request) => {
   }
 
   return jsonResponse({
+    action: "invited",
     email,
     invited: true,
+    message: `Invite sent to ${email}. They can set their password from the email link.`,
     name,
     userId: data.user?.id ?? null,
   });

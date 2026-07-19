@@ -80,6 +80,15 @@ type AdminRow = AdminEmail & {
   profile_id?: string;
 };
 
+type InviteAdminResponse = {
+  action?: "already_admin" | "already_invited" | "invited" | "promoted";
+  email?: string;
+  invited?: boolean;
+  message?: string;
+  name?: string;
+  userId?: string | null;
+};
+
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
@@ -195,16 +204,24 @@ function AdminUsersPage() {
     setIsAddingAdmin(true);
     setMessage("");
 
-    const { error: inviteError } = await supabase.functions.invoke("invite-admin-user", {
+    const { data, error: inviteError } = await supabase.functions.invoke<InviteAdminResponse>(
+      "invite-admin-user",
+      {
       body: { email, name },
-    });
+      },
+    );
 
     if (inviteError) {
       setMessage(await getInviteAdminErrorMessage(inviteError));
     } else {
       setAdminEmail("");
       setAdminName("");
-      setMessage(`Invite sent to ${email}. They can set their password from the email link.`);
+      setMessage(
+        data?.message ??
+          (data?.invited
+            ? `Invite sent to ${email}. They can set their password from the email link.`
+            : `${email} is now an admin.`),
+      );
       await loadAdmins();
     }
 
@@ -298,9 +315,11 @@ function AdminUsersPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShieldPlus className="size-4 text-primary" />
-                Invite admin
+                Add admin
               </CardTitle>
-              <CardDescription>Send an invite link so the admin can set their password.</CardDescription>
+              <CardDescription>
+                Promote existing users or invite new admins to set a password.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form className="grid gap-3" onSubmit={handleAddAdmin}>
@@ -357,6 +376,7 @@ function AdminUsersPage() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Added</TableHead>
                     <TableHead>Last seen</TableHead>
                     <TableHead className="w-48 text-right">Action</TableHead>
@@ -372,9 +392,14 @@ function AdminUsersPage() {
                       return (
                         <TableRow key={admin.email}>
                           <TableCell className="font-medium">
-                            {admin.name ?? "Pending signup"}
+                            {admin.name ?? "Invite pending"}
                           </TableCell>
                           <TableCell>{admin.email}</TableCell>
+                          <TableCell>
+                            <Badge variant={admin.profile_id ? "default" : "secondary"}>
+                              {admin.profile_id ? "Active" : "Pending"}
+                            </Badge>
+                          </TableCell>
                           <TableCell>{formatTimestamp(admin.created_at)}</TableCell>
                           <TableCell>{formatTimestamp(admin.last_seen_at)}</TableCell>
                           <TableCell className="text-right">
@@ -420,7 +445,7 @@ function AdminUsersPage() {
                     })
                   ) : (
                     <TableRow>
-                      <TableCell className="text-muted-foreground" colSpan={5}>
+                      <TableCell className="text-muted-foreground" colSpan={6}>
                         {isLoading ? "Loading admin users..." : "No admin users yet."}
                       </TableCell>
                     </TableRow>
