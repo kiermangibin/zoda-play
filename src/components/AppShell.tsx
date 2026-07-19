@@ -33,7 +33,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth";
-import zodaZLogo from "@/assets/zoda-Z.png";
+import zodaFavicon from "@/assets/zoda-favicon.png";
 
 const missionNav = [
   { icon: LayoutDashboard, label: "Overview", to: "/mission" },
@@ -75,7 +75,7 @@ export function AppShell({
       <Sidebar collapsible="icon" variant="sidebar">
         <SidebarHeader className="p-3">
           <Link className="flex items-center gap-3 rounded-lg px-2 py-2" to="/mission">
-            <img className="size-8 object-contain" src={zodaZLogo} alt="" aria-hidden="true" />
+            <img className="size-8 object-contain" src={zodaFavicon} alt="" aria-hidden="true" />
             <div className="min-w-0 group-data-[collapsible=icon]:hidden">
               <p className="truncate text-xs font-black uppercase tracking-[0.18em] text-primary">
                 ZODA
