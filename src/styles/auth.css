@@ -128,6 +128,34 @@
   box-shadow: 0 0 0 3px rgba(217, 240, 109, 0.45);
 }
 
+.zoda-auth-password-field input {
+  padding-right: 3rem;
+}
+
+.zoda-auth-password-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  bottom: 0.5rem;
+  color: rgba(21, 25, 19, 0.58);
+  cursor: pointer;
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  right: 0.55rem;
+  width: 2rem;
+}
+
+.zoda-auth-password-toggle:hover,
+.zoda-auth-password-toggle:focus-visible {
+  background: rgba(21, 25, 19, 0.08);
+  color: #151913;
+  outline: 0;
+}
+
 .zoda-auth-form__error {
   background: rgba(176, 42, 36, 0.1);
   border: 1px solid rgba(176, 42, 36, 0.25);

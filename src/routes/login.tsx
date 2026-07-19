@@ -1,6 +1,6 @@
 import { FormEvent, useMemo, useState } from "react";
 import { Link, createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
-import { ArrowRight, LockKeyhole, Mail, UserRound } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
 
 import { isAuthenticated, useAuth } from "@/lib/auth";
 import zodaZLogo from "@/assets/zoda-Z.png";
@@ -47,6 +47,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [notice, setNotice] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -159,7 +160,7 @@ function LoginPage() {
             />
           </label>
 
-          <label>
+          <label className="zoda-auth-password-field">
             <span>Password</span>
             <i aria-hidden="true">
               <LockKeyhole size={16} />
@@ -171,9 +172,17 @@ function LoginPage() {
               onChange={(event) => setPassword(event.target.value)}
               placeholder="Minimum 8 characters"
               required
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
             />
+            <button
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="zoda-auth-password-toggle"
+              type="button"
+              onClick={() => setShowPassword((current) => !current)}
+            >
+              {showPassword ? <EyeOff size={16} aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}
+            </button>
           </label>
 
           {mode === "sign-in" ? (
