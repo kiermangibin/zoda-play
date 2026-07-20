@@ -132,6 +132,21 @@ function renderInviteEmail({
 </html>`;
 }
 
+function buildAppActionUrl({
+  redirectTo,
+  tokenHash,
+  type,
+}: {
+  redirectTo: string;
+  tokenHash: string;
+  type: string;
+}) {
+  const url = new URL(redirectTo);
+  url.searchParams.set("token_hash", tokenHash);
+  url.searchParams.set("type", type);
+  return url.toString();
+}
+
 async function sendResendEmail({
   actionUrl,
   name,
@@ -412,9 +427,17 @@ Deno.serve(async (request) => {
     return jsonResponse({ error: inviteError.message }, 400);
   }
 
+  const actionUrl = data.properties.hashed_token
+    ? buildAppActionUrl({
+        redirectTo,
+        tokenHash: data.properties.hashed_token,
+        type: data.properties.verification_type || "invite",
+      })
+    : data.properties.action_link;
+
   try {
     await sendResendEmail({
-      actionUrl: data.properties.action_link,
+      actionUrl,
       name,
       to: email,
     });
