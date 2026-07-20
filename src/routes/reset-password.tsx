@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Eye, EyeOff, LockKeyhole } from "lucide-react";
-import type { EmailOtpType } from "@supabase/supabase-js";
 
 import { useAuth } from "@/lib/auth";
 import { requireSupabase, supabase } from "@/lib/supabase";
@@ -10,45 +9,6 @@ import "@/styles/auth.css";
 
 const setPasswordLinkMessage =
   "Open the latest invite or password reset email link, then set your password from that page.";
-
-function getEmailOtpType(value: string | null): EmailOtpType {
-  if (
-    value === "email" ||
-    value === "invite" ||
-    value === "recovery" ||
-    value === "signup" ||
-    value === "magiclink"
-  ) {
-    return value;
-  }
-
-  return "recovery";
-}
-
-async function verifyTokenHash({
-  tokenHash,
-  type,
-}: {
-  tokenHash: string;
-  type: string | null;
-}) {
-  const client = requireSupabase();
-  const preferredType = getEmailOtpType(type);
-  const attempts = preferredType === "email" ? ["email"] : [preferredType, "email"];
-  let lastError: Error | null = null;
-
-  for (const attempt of attempts) {
-    const { data, error } = await client.auth.verifyOtp({
-      token_hash: tokenHash,
-      type: attempt,
-    });
-
-    if (!error && data.session) return;
-    if (error) lastError = error;
-  }
-
-  if (lastError) throw lastError;
-}
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -66,6 +26,8 @@ function ResetPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [tokenHash, setTokenHash] = useState("");
+  const [tokenType, setTokenType] = useState("");
 
   useEffect(() => {
     let isMounted = true;
@@ -108,7 +70,8 @@ function ResetPasswordPage() {
           });
           if (sessionError) throw sessionError;
         } else if (tokenHash) {
-          await verifyTokenHash({ tokenHash, type });
+          setTokenHash(tokenHash);
+          setTokenType(type ?? "invite");
         }
 
         const {
@@ -117,11 +80,13 @@ function ResetPasswordPage() {
 
         if (!isMounted) return;
 
-        setIsSessionReady(Boolean(session));
-        if (!session) {
+        setIsSessionReady(Boolean(session || tokenHash));
+        if (!session && !tokenHash) {
           setError(setPasswordLinkMessage);
         } else if (code || accessToken || refreshToken || tokenHash) {
-          window.history.replaceState({}, document.title, window.location.pathname);
+          if (!tokenHash) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
         }
       } catch (nextError) {
         if (!isMounted) return;
@@ -149,7 +114,31 @@ function ResetPasswordPage() {
     setIsSubmitting(true);
 
     try {
-      await auth.updatePassword(password);
+      if (tokenHash) {
+        const { error: functionError } = await requireSupabase().functions.invoke(
+          "complete-password-setup",
+          {
+            body: {
+              password,
+              tokenHash,
+              type: tokenType || "invite",
+            },
+          },
+        );
+
+        if (functionError) {
+          const context = (functionError as Error & { context?: Response }).context;
+          if (context) {
+            const body = (await context.clone().json().catch(() => null)) as { error?: unknown } | null;
+            if (typeof body?.error === "string") throw new Error(body.error);
+          }
+
+          throw new Error(functionError.message);
+        }
+      } else {
+        await auth.updatePassword(password);
+      }
+
       await auth.signOut();
       await navigate({ to: "/login", replace: true });
     } catch (nextError) {
