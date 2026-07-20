@@ -38,6 +38,10 @@ export function getSupabaseAuthErrorMessage(message: string) {
     return "Email sending is temporarily busy. Please try again in a few minutes.";
   }
 
+  if (normalizedMessage.includes("auth session missing")) {
+    return "Open the latest password reset email link, then set your new password from that page.";
+  }
+
   return message;
 }
 
@@ -296,7 +300,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const { error } = await requireSupabase().auth.updateUser({ password });
 
-        if (error) throw new Error(error.message);
+        if (error) throw new Error(getSupabaseAuthErrorMessage(error.message));
       },
     }),
     [currentUser, isAdmin],

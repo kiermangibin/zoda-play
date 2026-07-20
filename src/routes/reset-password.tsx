@@ -1,8 +1,9 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Eye, EyeOff, LockKeyhole } from "lucide-react";
 
 import { useAuth } from "@/lib/auth";
+import { requireSupabase, supabase } from "@/lib/supabase";
 import zodaZLogo from "@/assets/zoda-Z.png";
 import "@/styles/auth.css";
 
@@ -17,9 +18,79 @@ function ResetPasswordPage() {
   const auth = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [isPreparingSession, setIsPreparingSession] = useState(true);
+  const [isSessionReady, setIsSessionReady] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function prepareResetSession() {
+      if (!supabase) {
+        setIsPreparingSession(false);
+        return;
+      }
+
+      try {
+        const searchParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+        const code = searchParams.get("code");
+        const accessToken = hashParams.get("access_token");
+        const refreshToken = hashParams.get("refresh_token");
+        const urlError =
+          searchParams.get("error_description") ??
+          hashParams.get("error_description") ??
+          searchParams.get("error") ??
+          hashParams.get("error");
+
+        if (urlError) {
+          throw new Error(urlError.replaceAll("+", " "));
+        }
+
+        if (code) {
+          const { error: exchangeError } = await requireSupabase().auth.exchangeCodeForSession(code);
+          if (exchangeError) throw exchangeError;
+        } else if (accessToken && refreshToken) {
+          const { error: sessionError } = await requireSupabase().auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (sessionError) throw sessionError;
+        }
+
+        const {
+          data: { session },
+        } = await requireSupabase().auth.getSession();
+
+        if (!isMounted) return;
+
+        setIsSessionReady(Boolean(session));
+        if (!session) {
+          setError("Open the latest password reset email link, then set your new password from that page.");
+        } else if (code || accessToken || refreshToken) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      } catch (nextError) {
+        if (!isMounted) return;
+        setIsSessionReady(false);
+        setError(
+          nextError instanceof Error
+            ? nextError.message
+            : "Open the latest password reset email link, then set your new password from that page.",
+        );
+      } finally {
+        if (isMounted) setIsPreparingSession(false);
+      }
+    }
+
+    void prepareResetSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -86,10 +157,10 @@ function ResetPasswordPage() {
 
           <button
             className="zoda-auth-form__submit"
-            disabled={isSubmitting || !auth.hasAuthConfig}
+            disabled={isPreparingSession || isSubmitting || !auth.hasAuthConfig || !isSessionReady}
             type="submit"
           >
-            {isSubmitting ? "Saving" : "Save password"}
+            {isPreparingSession ? "Checking link" : isSubmitting ? "Saving" : "Save password"}
             <ArrowRight size={16} aria-hidden="true" />
           </button>
         </form>
