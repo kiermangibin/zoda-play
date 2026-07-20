@@ -49,6 +49,7 @@ const resendApiKey = Deno.env.get("RESEND_API_KEY") ?? "";
 const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
 const rawHookSecret = Deno.env.get("SEND_EMAIL_HOOK_SECRET") ?? "";
 const hookSecret = rawHookSecret.replace(/^v1,whsec_/, "");
+const authTemplateId = Deno.env.get("ZODA_AUTH_TEMPLATE_ID") ?? "";
 const zodaSans = '"Commuters Sans", "Geist", Arial, Helvetica, sans-serif';
 const zodaDisplay = '"Euphora", "Commuters Sans", Arial, Helvetica, sans-serif';
 const pageStyle = `margin:0;background-color:#050806;color:#f8fff4;font-family:${zodaSans};`;
@@ -214,11 +215,31 @@ async function sendEmail({
   to: string;
   user: HookUser;
 }) {
+  const templatePayload = authTemplateId
+    ? {
+        subject: template.subject,
+        template: {
+          id: authTemplateId,
+          variables: {
+            ACTION_URL: actionUrl || "https://zoda.life",
+            CTA_LABEL: template.ctaLabel ?? "Continue",
+            HEADING: template.heading,
+            INTRO: template.intro,
+            NAME: getDisplayName(user),
+            PREVIEW: template.preview,
+            SUBJECT: template.subject,
+          },
+        },
+      }
+    : {
+        html: renderEmail({ actionUrl, code, template, user }),
+        subject: template.subject,
+      };
+
   const response = await fetch("https://api.resend.com/emails", {
     body: JSON.stringify({
       from: fromEmail,
-      html: renderEmail({ actionUrl, code, template, user }),
-      subject: template.subject,
+      ...templatePayload,
       to,
     }),
     headers: {

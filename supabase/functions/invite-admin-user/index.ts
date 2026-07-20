@@ -143,16 +143,37 @@ async function sendResendEmail({
 }) {
   const resendApiKey = Deno.env.get("RESEND_API_KEY") ?? "";
   const fromEmail = Deno.env.get("AUTH_EMAIL_FROM") ?? "ZODA Mission <no-reply@zoda.life>";
+  const templateId = Deno.env.get("ZODA_AUTH_TEMPLATE_ID") ?? "";
 
   if (!resendApiKey) {
     throw new Error("Resend is not configured.");
   }
 
+  const templatePayload = templateId
+    ? {
+        subject: adminInviteTemplate.subject,
+        template: {
+          id: templateId,
+          variables: {
+            ACTION_URL: actionUrl,
+            CTA_LABEL: adminInviteTemplate.ctaLabel,
+            HEADING: adminInviteTemplate.heading,
+            INTRO: adminInviteTemplate.intro,
+            NAME: name,
+            PREVIEW: adminInviteTemplate.preview,
+            SUBJECT: adminInviteTemplate.subject,
+          },
+        },
+      }
+    : {
+        html: renderInviteEmail({ actionUrl, name, template: adminInviteTemplate }),
+        subject: adminInviteTemplate.subject,
+      };
+
   const response = await fetch("https://api.resend.com/emails", {
     body: JSON.stringify({
       from: fromEmail,
-      html: renderInviteEmail({ actionUrl, name, template: adminInviteTemplate }),
-      subject: adminInviteTemplate.subject,
+      ...templatePayload,
       to,
     }),
     headers: {

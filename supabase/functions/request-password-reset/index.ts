@@ -14,10 +14,10 @@ const corsHeaders = {
 };
 const zodaSans = '"Commuters Sans", "Geist", Arial, Helvetica, sans-serif';
 const zodaDisplay = '"Euphora", "Commuters Sans", Arial, Helvetica, sans-serif';
-const pageStyle = `margin:0;background-color:#050806;color:#f8fff4;font-family:${zodaSans};`;
-const textStyle = `margin:0;color:#d9eadf;font-family:${zodaSans};font-size:15px;line-height:1.7;`;
-const mutedTextStyle = `margin:28px 0 0;color:#9cb5aa;font-family:${zodaSans};font-size:12px;line-height:1.7;`;
-const buttonStyle = `background-color:#55cda1;border:1px solid #55cda1;border-radius:8px;color:#06100b;display:inline-block;font-family:${zodaSans};font-size:14px;font-weight:900;line-height:1;padding:15px 22px;text-align:center;text-decoration:none;`;
+const pageStyle = `margin:0;background-color:#f3f5ed;color:#151913;font-family:${zodaSans};`;
+const textStyle = `margin:0;color:#343a31;font-family:${zodaSans};font-size:15px;line-height:1.7;`;
+const mutedTextStyle = `margin:28px 0 0;color:#6d7568;font-family:${zodaSans};font-size:12px;line-height:1.7;`;
+const buttonStyle = `background-color:#151913;border:1px solid #151913;border-radius:8px;color:#ffffff;display:inline-block;font-family:${zodaSans};font-size:14px;font-weight:900;line-height:1;padding:15px 22px;text-align:center;text-decoration:none;`;
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -46,26 +46,26 @@ function renderResetEmail({ actionUrl, name }: { actionUrl: string; name: string
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Reset your ZODA Mission password</title>
   </head>
-  <body bgcolor="#050806" style="${pageStyle}">
+  <body bgcolor="#f3f5ed" style="${pageStyle}">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Reset your ZODA Mission password.</div>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#050806" style="background-color:#050806;padding:32px 16px;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#f3f5ed" style="background-color:#f3f5ed;padding:32px 16px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#0b110e" style="max-width:560px;border:1px solid #1e332a;border-radius:12px;overflow:hidden;background-color:#0b110e;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#fffff8" style="max-width:560px;border:1px solid #cfd7c8;border-radius:12px;overflow:hidden;background-color:#fffff8;">
             <tr>
-              <td bgcolor="#0b110e" style="padding:22px 24px;border-bottom:1px solid #1e332a;background-color:#0b110e;">
-                <div style="color:#55cda1;font-family:${zodaSans};font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;">ZODA Mission</div>
-                <div style="color:#b7cfc4;font-family:${zodaSans};font-size:12px;margin-top:6px;">Mission access email</div>
+              <td bgcolor="#d9f06d" style="padding:22px 24px;background-color:#d9f06d;border-bottom:1px solid #151913;">
+                <div style="color:#151913;font-family:${zodaSans};font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;">ZODA Mission</div>
+                <div style="color:#3f4539;font-family:${zodaSans};font-size:12px;font-weight:800;margin-top:6px;">Mission access email</div>
               </td>
             </tr>
             <tr>
-              <td bgcolor="#0b110e" style="padding:30px 24px 28px;background-color:#0b110e;">
-                <h1 style="margin:0 0 14px;color:#ffffff;font-family:${zodaDisplay};font-size:30px;font-weight:900;line-height:1.05;">Reset your ZODA Mission password</h1>
+              <td bgcolor="#fffff8" style="padding:30px 24px 28px;background-color:#fffff8;">
+                <h1 style="margin:0 0 14px;color:#151913;font-family:${zodaDisplay};font-size:32px;font-weight:900;line-height:1.05;">Reset your ZODA Mission password</h1>
                 <p style="${textStyle}">Hi ${escapeHtml(name)},</p>
-                <p style="margin:12px 0 0;color:#d9eadf;font-family:${zodaSans};font-size:15px;line-height:1.7;">Use the secure link below to choose a new password for your account.</p>
+                <p style="margin:12px 0 0;color:#343a31;font-family:${zodaSans};font-size:15px;line-height:1.7;">Use the secure link below to choose a new password for your account.</p>
                 <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:24px;">
                   <tr>
-                    <td bgcolor="#55cda1" style="border-radius:8px;background-color:#55cda1;">
+                    <td bgcolor="#151913" style="border-radius:8px;background-color:#151913;">
                       <a href="${escapeHtml(actionUrl)}" style="${buttonStyle}">Reset password</a>
                     </td>
                   </tr>
@@ -92,16 +92,37 @@ async function sendResetEmail({
 }) {
   const resendApiKey = Deno.env.get("RESEND_API_KEY") ?? "";
   const fromEmail = Deno.env.get("AUTH_EMAIL_FROM") ?? "ZODA Mission <no-reply@zoda.life>";
+  const templateId = Deno.env.get("ZODA_AUTH_TEMPLATE_ID") ?? "";
 
   if (!resendApiKey) {
     throw new Error("Resend is not configured.");
   }
 
+  const templatePayload = templateId
+    ? {
+        subject: "Reset your ZODA Mission password",
+        template: {
+          id: templateId,
+          variables: {
+            ACTION_URL: actionUrl,
+            CTA_LABEL: "Reset password",
+            HEADING: "Reset your ZODA Mission password",
+            INTRO: "Use the secure link below to choose a new password for your account.",
+            NAME: name,
+            PREVIEW: "Reset your ZODA Mission password.",
+            SUBJECT: "Reset your ZODA Mission password",
+          },
+        },
+      }
+    : {
+        html: renderResetEmail({ actionUrl, name }),
+        subject: "Reset your ZODA Mission password",
+      };
+
   const response = await fetch("https://api.resend.com/emails", {
     body: JSON.stringify({
       from: fromEmail,
-      html: renderResetEmail({ actionUrl, name }),
-      subject: "Reset your ZODA Mission password",
+      ...templatePayload,
       to: email,
     }),
     headers: {
