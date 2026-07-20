@@ -64,6 +64,10 @@ type Profile = {
 
 type RoleFilter = "all" | "admin" | "user";
 
+type ListUsersResponse = {
+  users?: Profile[];
+};
+
 function getAdminActionErrorMessage(message: string) {
   if (message.toLowerCase().includes("admin access required")) {
     return "Your app session has admin access, but Supabase has not synced server-side admin access yet. Apply the latest Supabase migration, then sign out and back in.";
@@ -110,17 +114,19 @@ function AdminMembersPage() {
       return;
     }
 
-    const { data, error: queryError } = await supabase
-      .from("profiles")
-      .select("id,email,name,role,created_at,last_seen_at")
-      .order("last_seen_at", { ascending: false });
+    const { data, error: queryError } = await supabase.functions.invoke<ListUsersResponse>(
+      "list-users",
+      {
+        method: "GET",
+      },
+    );
 
     if (queryError) {
-      setError(queryError.message);
+      setError(await getFunctionErrorMessage(queryError));
       setProfiles([]);
     } else {
       setError("");
-      setProfiles((data ?? []) as Profile[]);
+      setProfiles(data?.users ?? []);
     }
 
     setIsLoading(false);
