@@ -35,7 +35,7 @@ export function getSupabaseAuthErrorMessage(message: string) {
   const normalizedMessage = message.toLowerCase();
 
   if (normalizedMessage.includes("email rate limit")) {
-    return "Supabase email limit reached. Wait about an hour before sending another email, or connect custom SMTP in Supabase to raise the limit.";
+    return "Email sending is temporarily busy. Please try again in a few minutes.";
   }
 
   return message;
@@ -223,8 +223,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           throw new Error("Enter a valid email address.");
         }
 
-        const { error } = await requireSupabase().auth.resetPasswordForEmail(normalizedEmail, {
-          redirectTo: `${window.location.origin}/reset-password`,
+        const { error } = await requireSupabase().functions.invoke("request-password-reset", {
+          body: {
+            email: normalizedEmail,
+            redirectTo: `${window.location.origin}/reset-password`,
+          },
         });
 
         if (error) throw new Error(getSupabaseAuthErrorMessage(error.message));

@@ -428,3 +428,8 @@ entrypoint = "./functions/delete-user-account/index.ts"
 enabled = true
 verify_jwt = false
 entrypoint = "./functions/send-auth-email/index.ts"
+
+[functions.request-password-reset]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/request-password-reset/index.ts"

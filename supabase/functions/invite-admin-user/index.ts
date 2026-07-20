@@ -17,6 +17,14 @@ type AuthUser = {
   };
 };
 
+type EmailTemplate = {
+  ctaLabel: string;
+  heading: string;
+  intro: string;
+  preview: string;
+  subject: string;
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -25,6 +33,15 @@ const corsHeaders = {
 };
 
 const bootstrapAdminEmails = new Set(["trish@zoda.sg"]);
+const zodaSans = '"Commuters Sans", "Geist", Arial, Helvetica, sans-serif';
+const zodaDisplay = '"Euphora", "Commuters Sans", Arial, Helvetica, sans-serif';
+const adminInviteTemplate: EmailTemplate = {
+  ctaLabel: "Accept invitation",
+  heading: "You are invited to ZODA Mission",
+  intro: "An admin invited you to ZODA Mission. Accept the invite to set your password and access your workspace.",
+  preview: "Accept your ZODA Mission invitation.",
+  subject: "You are invited to ZODA Mission",
+};
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -50,6 +67,94 @@ function getUserName(user: AuthUser | null, fallbackName: string, fallbackEmail:
 
 function isUnfinishedInvite(user: AuthUser | null) {
   return Boolean(user?.invited_at && !user.last_sign_in_at);
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function renderInviteEmail({
+  actionUrl,
+  name,
+  template,
+}: {
+  actionUrl: string;
+  name: string;
+  template: EmailTemplate;
+}) {
+  return `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>${escapeHtml(template.subject)}</title>
+  </head>
+  <body style="margin:0;background:#050806;color:#f8fff4;font-family:${zodaSans};">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(template.preview)}</div>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#050806;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;border:1px solid #1e332a;border-radius:12px;overflow:hidden;background:#0b110e;">
+            <tr>
+              <td style="padding:22px 24px;border-bottom:1px solid #1e332a;">
+                <div style="color:#55cda1;font-family:${zodaSans};font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;">ZODA Mission</div>
+                <div style="color:#8fa99d;font-family:${zodaSans};font-size:12px;margin-top:6px;">Mission access email</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:30px 24px 28px;">
+                <h1 style="margin:0 0 14px;color:#f8fff4;font-family:${zodaDisplay};font-size:30px;font-weight:900;line-height:1.05;">${escapeHtml(template.heading)}</h1>
+                <p style="margin:0;color:#cfe0d6;font-family:${zodaSans};font-size:15px;line-height:1.7;">Hi ${escapeHtml(name)},</p>
+                <p style="margin:12px 0 0;color:#cfe0d6;font-family:${zodaSans};font-size:15px;line-height:1.7;">${escapeHtml(template.intro)}</p>
+                <a href="${escapeHtml(actionUrl)}" style="display:inline-block;margin-top:24px;background:#55cda1;color:#06100b;text-decoration:none;font-family:${zodaSans};font-size:14px;font-weight:900;border-radius:8px;padding:14px 20px;">${escapeHtml(template.ctaLabel)}</a>
+                <p style="margin:28px 0 0;color:#8fa99d;font-family:${zodaSans};font-size:12px;line-height:1.7;">If you did not expect this invite, you can safely ignore this email.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+async function sendResendEmail({
+  actionUrl,
+  name,
+  to,
+}: {
+  actionUrl: string;
+  name: string;
+  to: string;
+}) {
+  const resendApiKey = Deno.env.get("RESEND_API_KEY") ?? "";
+  const fromEmail = Deno.env.get("AUTH_EMAIL_FROM") ?? "ZODA Mission <no-reply@zoda.life>";
+
+  if (!resendApiKey) {
+    throw new Error("Resend is not configured.");
+  }
+
+  const response = await fetch("https://api.resend.com/emails", {
+    body: JSON.stringify({
+      from: fromEmail,
+      html: renderInviteEmail({ actionUrl, name, template: adminInviteTemplate }),
+      subject: adminInviteTemplate.subject,
+      to,
+    }),
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
 }
 
 async function findUserByEmail(
@@ -263,13 +368,30 @@ Deno.serve(async (request) => {
     });
   }
 
-  const { data, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
-    data: { name },
-    redirectTo,
+  const { data, error: inviteError } = await supabase.auth.admin.generateLink({
+    email,
+    options: {
+      data: { name },
+      redirectTo,
+    },
+    type: "invite",
   });
 
   if (inviteError) {
     return jsonResponse({ error: inviteError.message }, 400);
+  }
+
+  try {
+    await sendResendEmail({
+      actionUrl: data.properties.action_link,
+      name,
+      to: email,
+    });
+  } catch (error) {
+    return jsonResponse(
+      { error: error instanceof Error ? error.message : "Unable to send invite email." },
+      500,
+    );
   }
 
   const { error: insertError } = await supabase
@@ -286,6 +408,6 @@ Deno.serve(async (request) => {
     invited: true,
     message: `Invite sent to ${email}. They can set their password from the email link.`,
     name,
-    userId: data.user?.id ?? null,
+    userId: data.user.id,
   });
 });
