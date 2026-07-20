@@ -51,6 +51,10 @@ const rawHookSecret = Deno.env.get("SEND_EMAIL_HOOK_SECRET") ?? "";
 const hookSecret = rawHookSecret.replace(/^v1,whsec_/, "");
 const zodaSans = '"Commuters Sans", "Geist", Arial, Helvetica, sans-serif';
 const zodaDisplay = '"Euphora", "Commuters Sans", Arial, Helvetica, sans-serif';
+const pageStyle = `margin:0;background-color:#050806;color:#f8fff4;font-family:${zodaSans};`;
+const textStyle = `margin:0;color:#d9eadf;font-family:${zodaSans};font-size:15px;line-height:1.7;`;
+const mutedTextStyle = `margin:28px 0 0;color:#9cb5aa;font-family:${zodaSans};font-size:12px;line-height:1.7;`;
+const buttonStyle = `background-color:#55cda1;border:1px solid #55cda1;border-radius:8px;color:#06100b;display:inline-block;font-family:${zodaSans};font-size:14px;font-weight:900;line-height:1;padding:15px 22px;text-align:center;text-decoration:none;`;
 
 const templates: Record<EmailActionType, EmailTemplate> = {
   signup: {
@@ -151,7 +155,13 @@ function renderEmail({
        <div style="border:1px solid #20372d;background:#101914;border-radius:8px;padding:16px 18px;color:#f8fff4;font-family:${zodaSans};font-size:28px;font-weight:900;letter-spacing:.2em;text-align:center;">${escapeHtml(code)}</div>`
     : "";
   const cta = actionUrl && template.ctaLabel
-    ? `<a href="${escapeHtml(actionUrl)}" style="display:inline-block;margin-top:24px;background:#55cda1;color:#06100b;text-decoration:none;font-family:${zodaSans};font-size:14px;font-weight:900;border-radius:8px;padding:14px 20px;">${escapeHtml(template.ctaLabel)}</a>`
+    ? `<table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:24px;">
+         <tr>
+           <td bgcolor="#55cda1" style="border-radius:8px;background-color:#55cda1;">
+             <a href="${escapeHtml(actionUrl)}" style="${buttonStyle}">${escapeHtml(template.ctaLabel)}</a>
+           </td>
+         </tr>
+       </table>`
     : "";
 
   return `<!doctype html>
@@ -161,26 +171,26 @@ function renderEmail({
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>${escapeHtml(template.subject)}</title>
   </head>
-  <body style="margin:0;background:#050806;color:#f8fff4;font-family:${zodaSans};">
+  <body bgcolor="#050806" style="${pageStyle}">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(template.preview)}</div>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#050806;padding:32px 16px;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#050806" style="background-color:#050806;padding:32px 16px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;border:1px solid #1e332a;border-radius:12px;overflow:hidden;background:#0b110e;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#0b110e" style="max-width:560px;border:1px solid #1e332a;border-radius:12px;overflow:hidden;background-color:#0b110e;">
             <tr>
-              <td style="padding:22px 24px;border-bottom:1px solid #1e332a;">
+              <td bgcolor="#0b110e" style="padding:22px 24px;border-bottom:1px solid #1e332a;background-color:#0b110e;">
                 <div style="color:#55cda1;font-family:${zodaSans};font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;">ZODA Mission</div>
-                <div style="color:#8fa99d;font-family:${zodaSans};font-size:12px;margin-top:6px;">Mission access email</div>
+                <div style="color:#b7cfc4;font-family:${zodaSans};font-size:12px;margin-top:6px;">Mission access email</div>
               </td>
             </tr>
             <tr>
-              <td style="padding:30px 24px 28px;">
-                <h1 style="margin:0 0 14px;color:#f8fff4;font-family:${zodaDisplay};font-size:30px;font-weight:900;line-height:1.05;">${escapeHtml(template.heading)}</h1>
-                <p style="margin:0;color:#cfe0d6;font-family:${zodaSans};font-size:15px;line-height:1.7;">Hi ${name},</p>
-                <p style="margin:12px 0 0;color:#cfe0d6;font-family:${zodaSans};font-size:15px;line-height:1.7;">${safeIntro}</p>
+              <td bgcolor="#0b110e" style="padding:30px 24px 28px;background-color:#0b110e;">
+                <h1 style="margin:0 0 14px;color:#ffffff;font-family:${zodaDisplay};font-size:30px;font-weight:900;line-height:1.05;">${escapeHtml(template.heading)}</h1>
+                <p style="${textStyle}">Hi ${name},</p>
+                <p style="margin:12px 0 0;color:#d9eadf;font-family:${zodaSans};font-size:15px;line-height:1.7;">${safeIntro}</p>
                 ${cta}
                 ${codeBlock}
-                <p style="margin:28px 0 0;color:#8fa99d;font-family:${zodaSans};font-size:12px;line-height:1.7;">If you did not request this, you can safely ignore this email.</p>
+                <p style="${mutedTextStyle}">If you did not request this, you can safely ignore this email.</p>
               </td>
             </tr>
           </table>
