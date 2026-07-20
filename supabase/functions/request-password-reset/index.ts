@@ -14,10 +14,10 @@ const corsHeaders = {
 };
 const zodaSans = '"Commuters Sans", "Geist", Arial, Helvetica, sans-serif';
 const zodaDisplay = '"Euphora", "Commuters Sans", Arial, Helvetica, sans-serif';
-const pageStyle = `margin:0;background-color:#f3f5ed;color:#151913;font-family:${zodaSans};`;
+const pageStyle = `margin:0;background-color:#050505;color:#151913;font-family:${zodaSans};`;
 const textStyle = `margin:0;color:#343a31;font-family:${zodaSans};font-size:15px;line-height:1.7;`;
-const mutedTextStyle = `margin:28px 0 0;color:#6d7568;font-family:${zodaSans};font-size:12px;line-height:1.7;`;
-const buttonStyle = `background-color:#151913;border:1px solid #151913;border-radius:8px;color:#ffffff;display:inline-block;font-family:${zodaSans};font-size:14px;font-weight:900;line-height:1;padding:15px 22px;text-align:center;text-decoration:none;`;
+const mutedTextStyle = `margin:0;color:#2d4b3f;font-family:${zodaSans};font-size:12px;line-height:1.7;`;
+const buttonStyle = `background-color:#55cda1;border:1px solid #55cda1;border-radius:8px;color:#06100b;display:inline-block;font-family:${zodaSans};font-size:14px;font-weight:900;line-height:1;padding:15px 22px;text-align:center;text-decoration:none;`;
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -46,31 +46,37 @@ function renderResetEmail({ actionUrl, name }: { actionUrl: string; name: string
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Reset your ZODA Mission password</title>
   </head>
-  <body bgcolor="#f3f5ed" style="${pageStyle}">
+  <body bgcolor="#050505" style="${pageStyle}">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Reset your ZODA Mission password.</div>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#f3f5ed" style="background-color:#f3f5ed;padding:32px 16px;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#050505" style="background-color:#050505;padding:32px 16px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#fffff8" style="max-width:560px;border:1px solid #cfd7c8;border-radius:12px;overflow:hidden;background-color:#fffff8;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#ffffff" style="max-width:560px;border:1px solid #1e332a;border-radius:12px;overflow:hidden;background-color:#ffffff;">
             <tr>
-              <td bgcolor="#d9f06d" style="padding:22px 24px;background-color:#d9f06d;border-bottom:1px solid #151913;">
-                <div style="color:#151913;font-family:${zodaSans};font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;">ZODA Mission</div>
-                <div style="color:#3f4539;font-family:${zodaSans};font-size:12px;font-weight:800;margin-top:6px;">Mission access email</div>
+              <td bgcolor="#050505" style="padding:22px 24px;background-color:#050505;border-bottom:1px solid #55cda1;">
+                <div style="color:#55cda1;font-family:${zodaSans};font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;">ZODA Mission</div>
+                <div style="color:#cfe0d6;font-family:${zodaSans};font-size:12px;font-weight:800;margin-top:6px;">Mission access email</div>
               </td>
             </tr>
             <tr>
-              <td bgcolor="#fffff8" style="padding:30px 24px 28px;background-color:#fffff8;">
+              <td bgcolor="#ffffff" style="padding:30px 24px 28px;background-color:#ffffff;">
                 <h1 style="margin:0 0 14px;color:#151913;font-family:${zodaDisplay};font-size:32px;font-weight:900;line-height:1.05;">Reset your ZODA Mission password</h1>
                 <p style="${textStyle}">Hi ${escapeHtml(name)},</p>
                 <p style="margin:12px 0 0;color:#343a31;font-family:${zodaSans};font-size:15px;line-height:1.7;">Use the secure link below to choose a new password for your account.</p>
                 <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:24px;">
                   <tr>
-                    <td bgcolor="#151913" style="border-radius:8px;background-color:#151913;">
+                    <td bgcolor="#55cda1" style="border-radius:8px;background-color:#55cda1;">
                       <a href="${escapeHtml(actionUrl)}" style="${buttonStyle}">Reset password</a>
                     </td>
                   </tr>
                 </table>
-                <p style="${mutedTextStyle}">If you did not request this, you can safely ignore this email.</p>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:26px;">
+                  <tr>
+                    <td bgcolor="#eefbf5" style="background-color:#eefbf5;border:1px solid #b7ead6;border-radius:8px;padding:14px 16px;">
+                      <p style="${mutedTextStyle}">If you did not request this, you can safely ignore this email.</p>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
           </table>
