@@ -168,6 +168,15 @@ Deno.serve(async (request) => {
 
   const email = normalizeEmail(verifiedUser.email ?? "");
   if (email) {
+    const { error: unblockError } = await supabase
+      .from("deleted_user_emails")
+      .delete()
+      .eq("email", email);
+
+    if (unblockError) {
+      return jsonResponse({ error: unblockError.message }, 500);
+    }
+
     const { data: adminEmail } = await supabase
       .from("admin_emails")
       .select("email")

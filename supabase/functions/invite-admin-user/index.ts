@@ -339,6 +339,15 @@ Deno.serve(async (request) => {
   const origin = request.headers.get("Origin") ?? "https://mission-play.vercel.app";
   const redirectTo = `${origin}/reset-password`;
 
+  const { error: unblockError } = await supabase
+    .from("deleted_user_emails")
+    .delete()
+    .eq("email", email);
+
+  if (unblockError) {
+    return jsonResponse({ error: unblockError.message }, 500);
+  }
+
   const { data: existingAdmin } = await supabase
     .from("admin_emails")
     .select("email")
