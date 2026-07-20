@@ -133,18 +133,15 @@ function renderInviteEmail({
 }
 
 function buildAppActionUrl({
-  email,
   redirectTo,
   tokenHash,
   type,
 }: {
-  email: string;
   redirectTo: string;
   tokenHash: string;
   type: string;
 }) {
   const url = new URL(redirectTo);
-  url.searchParams.set("email", email);
   url.searchParams.set("token_hash", tokenHash);
   url.searchParams.set("type", type);
   return url.toString();
@@ -177,7 +174,6 @@ async function generateSetPasswordLink({
   return {
     actionUrl: data.properties.hashed_token
       ? buildAppActionUrl({
-          email,
           redirectTo,
           tokenHash: data.properties.hashed_token,
           type: data.properties.verification_type || type,

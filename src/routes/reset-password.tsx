@@ -26,11 +26,9 @@ function getEmailOtpType(value: string | null): EmailOtpType {
 }
 
 async function verifyTokenHash({
-  email,
   tokenHash,
   type,
 }: {
-  email: string | null;
   tokenHash: string;
   type: string | null;
 }) {
@@ -41,10 +39,9 @@ async function verifyTokenHash({
 
   for (const attempt of attempts) {
     const { data, error } = await client.auth.verifyOtp({
-      ...(email ? { email } : {}),
       token_hash: tokenHash,
       type: attempt,
-    } as Parameters<typeof client.auth.verifyOtp>[0]);
+    });
 
     if (!error && data.session) return;
     if (error) lastError = error;
@@ -90,7 +87,6 @@ function ResetPasswordPage() {
           hashParams.get("token_hash") ??
           searchParams.get("token") ??
           hashParams.get("token");
-        const email = searchParams.get("email") ?? hashParams.get("email");
         const type = searchParams.get("type") ?? hashParams.get("type");
         const urlError =
           searchParams.get("error_description") ??
@@ -112,7 +108,7 @@ function ResetPasswordPage() {
           });
           if (sessionError) throw sessionError;
         } else if (tokenHash) {
-          await verifyTokenHash({ email, tokenHash, type });
+          await verifyTokenHash({ tokenHash, type });
         }
 
         const {
