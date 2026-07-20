@@ -1,8 +1,8 @@
 .zoda-auth-page {
   align-items: center;
   background:
-    radial-gradient(circle at 15% 12%, rgba(95, 173, 86, 0.18), transparent 32rem),
-    linear-gradient(135deg, #111310 0%, #f3efe5 48%, #d9f06d 100%);
+    radial-gradient(circle at 15% 12%, rgba(85, 205, 161, 0.18), transparent 32rem),
+    linear-gradient(135deg, #050505 0%, #0b110e 46%, #55cda1 100%);
   box-sizing: border-box;
   color: #151913;
   display: flex;
@@ -12,8 +12,8 @@
 }
 
 .zoda-auth-panel {
-  background: rgba(255, 255, 255, 0.84);
-  border: 1px solid rgba(21, 25, 19, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(85, 205, 161, 0.22);
   border-radius: 8px;
   box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
@@ -43,7 +43,7 @@
 }
 
 .zoda-auth-panel__headline p {
-  color: #5d6b28;
+  color: #2f8d6e;
   font-size: 0.76rem;
   font-weight: 900;
   margin: 0 0 0.45rem;
@@ -79,8 +79,8 @@
 }
 
 .zoda-auth-toggle button[aria-selected="true"] {
-  background: #151913;
-  color: #f7f4eb;
+  background: #050505;
+  color: #55cda1;
 }
 
 .zoda-auth-form {
@@ -124,8 +124,8 @@
 }
 
 .zoda-auth-form input:focus {
-  border-color: #6b7f21;
-  box-shadow: 0 0 0 3px rgba(217, 240, 109, 0.45);
+  border-color: #55cda1;
+  box-shadow: 0 0 0 3px rgba(85, 205, 161, 0.28);
 }
 
 .zoda-auth-password-field input {
@@ -168,10 +168,10 @@
 }
 
 .zoda-auth-form__notice {
-  background: rgba(87, 145, 68, 0.12);
-  border: 1px solid rgba(87, 145, 68, 0.28);
+  background: rgba(85, 205, 161, 0.12);
+  border: 1px solid rgba(85, 205, 161, 0.28);
   border-radius: 8px;
-  color: #355f26;
+  color: #23654f;
   font-size: 0.85rem;
   font-weight: 800;
   margin: 0;
@@ -180,10 +180,10 @@
 
 .zoda-auth-form__submit {
   align-items: center;
-  background: #d9f06d;
-  border: 1px solid rgba(21, 25, 19, 0.14);
+  background: #55cda1;
+  border: 1px solid #55cda1;
   border-radius: 8px;
-  color: #151913;
+  color: #06100b;
   cursor: pointer;
   display: inline-flex;
   font-weight: 950;
@@ -199,7 +199,7 @@
 }
 
 .zoda-auth-form__link {
-  color: #4f6419;
+  color: #2f8d6e;
   font-size: 0.72rem;
   font-weight: 800;
   justify-self: end;
