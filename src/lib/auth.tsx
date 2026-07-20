@@ -45,6 +45,23 @@ export function getSupabaseAuthErrorMessage(message: string) {
   return message;
 }
 
+async function getFunctionErrorMessage(error: Error) {
+  const context = (error as Error & { context?: Response }).context;
+
+  if (context) {
+    try {
+      const body = (await context.clone().json()) as { error?: unknown };
+      if (typeof body.error === "string") {
+        return getSupabaseAuthErrorMessage(body.error);
+      }
+    } catch {
+      // Fall back to the SDK error message.
+    }
+  }
+
+  return getSupabaseAuthErrorMessage(error.message);
+}
+
 function toAuthUser(user: {
   email?: string | null;
   id: string;
@@ -234,7 +251,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           },
         });
 
-        if (error) throw new Error(getSupabaseAuthErrorMessage(error.message));
+        if (error) throw new Error(await getFunctionErrorMessage(error));
       },
       signIn: async (email, password) => {
         const normalizedEmail = normalizeEmail(email);

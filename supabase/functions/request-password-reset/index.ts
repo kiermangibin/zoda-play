@@ -6,6 +6,11 @@ type PasswordResetRequest = {
   redirectTo?: unknown;
 };
 
+type AuthUser = {
+  email?: string;
+  id: string;
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -28,6 +33,27 @@ function jsonResponse(body: unknown, status = 200) {
 
 function normalizeEmail(value: string) {
   return value.trim().toLowerCase();
+}
+
+async function findUserByEmail(
+  supabase: ReturnType<typeof createClient>,
+  email: string,
+): Promise<AuthUser | null> {
+  for (let page = 1; page <= 20; page += 1) {
+    const { data, error } = await supabase.auth.admin.listUsers({
+      page,
+      perPage: 1000,
+    });
+
+    if (error) throw error;
+
+    const users = data.users as AuthUser[];
+    const user = users.find((candidate) => normalizeEmail(candidate.email ?? "") === email);
+    if (user) return user;
+    if (users.length < 1000) return null;
+  }
+
+  return null;
 }
 
 function escapeHtml(value: string) {
@@ -182,6 +208,35 @@ Deno.serve(async (request) => {
       persistSession: false,
     },
   });
+
+  const { data: deletedUser, error: deletedError } = await supabase
+    .from("deleted_user_emails")
+    .select("email")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (deletedError) {
+    return jsonResponse({ error: deletedError.message }, 500);
+  }
+
+  if (deletedUser) {
+    return jsonResponse(
+      { error: "No active account found for this email. Ask an admin to send a new invite." },
+      404,
+    );
+  }
+
+  try {
+    const existingUser = await findUserByEmail(supabase, email);
+    if (!existingUser) {
+      return jsonResponse({ error: "No account found for this email." }, 404);
+    }
+  } catch (lookupError) {
+    return jsonResponse(
+      { error: lookupError instanceof Error ? lookupError.message : "Unable to find account." },
+      500,
+    );
+  }
 
   const { data, error } = await supabase.auth.admin.generateLink({
     email,
