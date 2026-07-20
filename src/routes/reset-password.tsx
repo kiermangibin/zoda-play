@@ -1,11 +1,23 @@
 import { FormEvent, useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Eye, EyeOff, LockKeyhole } from "lucide-react";
+import type { EmailOtpType } from "@supabase/supabase-js";
 
 import { useAuth } from "@/lib/auth";
 import { requireSupabase, supabase } from "@/lib/supabase";
 import zodaZLogo from "@/assets/zoda-Z.png";
 import "@/styles/auth.css";
+
+const setPasswordLinkMessage =
+  "Open the latest invite or password reset email link, then set your password from that page.";
+
+function getEmailOtpType(value: string | null): EmailOtpType {
+  if (value === "invite" || value === "recovery" || value === "signup" || value === "magiclink") {
+    return value;
+  }
+
+  return "recovery";
+}
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -39,6 +51,12 @@ function ResetPasswordPage() {
         const code = searchParams.get("code");
         const accessToken = hashParams.get("access_token");
         const refreshToken = hashParams.get("refresh_token");
+        const tokenHash =
+          searchParams.get("token_hash") ??
+          hashParams.get("token_hash") ??
+          searchParams.get("token") ??
+          hashParams.get("token");
+        const type = searchParams.get("type") ?? hashParams.get("type");
         const urlError =
           searchParams.get("error_description") ??
           hashParams.get("error_description") ??
@@ -58,6 +76,12 @@ function ResetPasswordPage() {
             refresh_token: refreshToken,
           });
           if (sessionError) throw sessionError;
+        } else if (tokenHash) {
+          const { error: verifyError } = await requireSupabase().auth.verifyOtp({
+            token_hash: tokenHash,
+            type: getEmailOtpType(type),
+          });
+          if (verifyError) throw verifyError;
         }
 
         const {
@@ -68,8 +92,8 @@ function ResetPasswordPage() {
 
         setIsSessionReady(Boolean(session));
         if (!session) {
-          setError("Open the latest password reset email link, then set your new password from that page.");
-        } else if (code || accessToken || refreshToken) {
+          setError(setPasswordLinkMessage);
+        } else if (code || accessToken || refreshToken || tokenHash) {
           window.history.replaceState({}, document.title, window.location.pathname);
         }
       } catch (nextError) {
@@ -78,7 +102,7 @@ function ResetPasswordPage() {
         setError(
           nextError instanceof Error
             ? nextError.message
-            : "Open the latest password reset email link, then set your new password from that page.",
+            : setPasswordLinkMessage,
         );
       } finally {
         if (isMounted) setIsPreparingSession(false);

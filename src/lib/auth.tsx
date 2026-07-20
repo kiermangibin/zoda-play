@@ -39,7 +39,7 @@ export function getSupabaseAuthErrorMessage(message: string) {
   }
 
   if (normalizedMessage.includes("auth session missing")) {
-    return "Open the latest password reset email link, then set your new password from that page.";
+    return "Open the latest invite or password reset email link, then set your password from that page.";
   }
 
   return message;
