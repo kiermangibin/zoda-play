@@ -81,7 +81,7 @@ type AdminRow = AdminEmail & {
 };
 
 type InviteAdminResponse = {
-  action?: "already_admin" | "already_invited" | "invited" | "promoted";
+  action?: "already_admin" | "already_invited" | "invited" | "promoted" | "reinvited";
   email?: string;
   invited?: boolean;
   message?: string;

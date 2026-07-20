@@ -147,6 +147,42 @@ function buildAppActionUrl({
   return url.toString();
 }
 
+async function generateSetPasswordLink({
+  email,
+  name,
+  redirectTo,
+  supabase,
+  type,
+}: {
+  email: string;
+  name: string;
+  redirectTo: string;
+  supabase: ReturnType<typeof createClient>;
+  type: "invite" | "recovery";
+}) {
+  const { data, error } = await supabase.auth.admin.generateLink({
+    email,
+    options: {
+      data: { name },
+      redirectTo,
+    },
+    type,
+  });
+
+  if (error) throw error;
+
+  return {
+    actionUrl: data.properties.hashed_token
+      ? buildAppActionUrl({
+          redirectTo,
+          tokenHash: data.properties.hashed_token,
+          type: data.properties.verification_type || type,
+        })
+      : data.properties.action_link,
+    userId: data.user.id,
+  };
+}
+
 async function sendResendEmail({
   actionUrl,
   name,
@@ -341,12 +377,50 @@ Deno.serve(async (request) => {
   }
 
   if (existingAdmin && existingUser && !existingProfile && isUnfinishedInvite(existingUser)) {
+    const profileName = getUserName(existingUser, name, email);
+
+    const { error: profileError } = await supabase.from("profiles").upsert(
+      {
+        email,
+        id: existingUser.id,
+        last_seen_at: new Date().toISOString(),
+        name: profileName,
+        role: "admin",
+      },
+      { onConflict: "id" },
+    );
+
+    if (profileError) {
+      return jsonResponse({ error: profileError.message }, 500);
+    }
+
+    try {
+      const { actionUrl } = await generateSetPasswordLink({
+        email,
+        name: profileName,
+        redirectTo,
+        supabase,
+        type: "recovery",
+      });
+
+      await sendResendEmail({
+        actionUrl,
+        name: profileName,
+        to: email,
+      });
+    } catch (error) {
+      return jsonResponse(
+        { error: error instanceof Error ? error.message : "Unable to resend invite email." },
+        500,
+      );
+    }
+
     return jsonResponse({
-      action: "already_invited",
+      action: "reinvited",
       email,
-      invited: false,
-      message: `${email} already has an admin invite pending. No duplicate invite email was sent.`,
-      name: getUserName(existingUser, name, email),
+      invited: true,
+      message: `Fresh invite sent to ${email}. They can set their password from the email link.`,
+      name: profileName,
       userId: existingUser.id,
     });
   }
@@ -414,30 +488,25 @@ Deno.serve(async (request) => {
     });
   }
 
-  const { data, error: inviteError } = await supabase.auth.admin.generateLink({
-    email,
-    options: {
-      data: { name },
+  let generatedInvite: { actionUrl: string; userId: string };
+  try {
+    generatedInvite = await generateSetPasswordLink({
+      email,
+      name,
       redirectTo,
-    },
-    type: "invite",
-  });
-
-  if (inviteError) {
-    return jsonResponse({ error: inviteError.message }, 400);
+      supabase,
+      type: "invite",
+    });
+  } catch (error) {
+    return jsonResponse(
+      { error: error instanceof Error ? error.message : "Unable to generate invite link." },
+      400,
+    );
   }
-
-  const actionUrl = data.properties.hashed_token
-    ? buildAppActionUrl({
-        redirectTo,
-        tokenHash: data.properties.hashed_token,
-        type: data.properties.verification_type || "invite",
-      })
-    : data.properties.action_link;
 
   try {
     await sendResendEmail({
-      actionUrl,
+      actionUrl: generatedInvite.actionUrl,
       name,
       to: email,
     });
@@ -462,6 +531,6 @@ Deno.serve(async (request) => {
     invited: true,
     message: `Invite sent to ${email}. They can set their password from the email link.`,
     name,
-    userId: data.user.id,
+    userId: generatedInvite.userId,
   });
 });

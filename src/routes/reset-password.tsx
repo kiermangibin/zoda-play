@@ -12,11 +12,42 @@ const setPasswordLinkMessage =
   "Open the latest invite or password reset email link, then set your password from that page.";
 
 function getEmailOtpType(value: string | null): EmailOtpType {
-  if (value === "invite" || value === "recovery" || value === "signup" || value === "magiclink") {
+  if (
+    value === "email" ||
+    value === "invite" ||
+    value === "recovery" ||
+    value === "signup" ||
+    value === "magiclink"
+  ) {
     return value;
   }
 
   return "recovery";
+}
+
+async function verifyTokenHash({
+  tokenHash,
+  type,
+}: {
+  tokenHash: string;
+  type: string | null;
+}) {
+  const client = requireSupabase();
+  const preferredType = getEmailOtpType(type);
+  const attempts = preferredType === "email" ? ["email"] : [preferredType, "email"];
+  let lastError: Error | null = null;
+
+  for (const attempt of attempts) {
+    const { data, error } = await client.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: attempt,
+    });
+
+    if (!error && data.session) return;
+    if (error) lastError = error;
+  }
+
+  if (lastError) throw lastError;
 }
 
 export const Route = createFileRoute("/reset-password")({
@@ -77,11 +108,7 @@ function ResetPasswordPage() {
           });
           if (sessionError) throw sessionError;
         } else if (tokenHash) {
-          const { error: verifyError } = await requireSupabase().auth.verifyOtp({
-            token_hash: tokenHash,
-            type: getEmailOtpType(type),
-          });
-          if (verifyError) throw verifyError;
+          await verifyTokenHash({ tokenHash, type });
         }
 
         const {
