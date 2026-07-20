@@ -66,18 +66,15 @@ type AdminEmail = {
   email: string;
 };
 
-type Profile = {
-  email: string;
-  id: string;
-  last_seen_at: string;
-  name: string;
-  role: "user" | "admin";
-};
-
 type AdminRow = AdminEmail & {
   last_seen_at?: string;
   name?: string;
   profile_id?: string;
+  status?: "active" | "pending";
+};
+
+type ListAdminUsersResponse = {
+  admins?: AdminRow[];
 };
 
 type InviteAdminResponse = {
@@ -139,39 +136,19 @@ function AdminUsersPage() {
       return;
     }
 
-    const [{ data: adminRows, error: adminError }, { data: profileRows, error: profileError }] =
-      await Promise.all([
-        supabase.from("admin_emails").select("email,created_at").order("created_at"),
-        supabase
-          .from("profiles")
-          .select("id,email,name,role,last_seen_at")
-          .eq("role", "admin")
-          .order("last_seen_at", { ascending: false }),
-      ]);
+    const { data, error: listError } =
+      await supabase.functions.invoke<ListAdminUsersResponse>("list-admin-users", {
+        method: "GET",
+      });
 
-    if (adminError || profileError) {
-      setError(adminError?.message ?? profileError?.message ?? "Unable to load admin users.");
+    if (listError) {
+      setError(await getInviteAdminErrorMessage(listError));
       setAdmins([]);
       setIsLoading(false);
       return;
     }
 
-    const profileByEmail = new Map(
-      ((profileRows ?? []) as Profile[]).map((profile) => [profile.email, profile]),
-    );
-
-    setAdmins(
-      ((adminRows ?? []) as AdminEmail[]).map((admin) => {
-        const profile = profileByEmail.get(admin.email);
-
-        return {
-          ...admin,
-          last_seen_at: profile?.last_seen_at,
-          name: profile?.name,
-          profile_id: profile?.id,
-        };
-      }),
-    );
+    setAdmins(data?.admins ?? []);
     setError("");
     setIsLoading(false);
   }
@@ -396,8 +373,8 @@ function AdminUsersPage() {
                           </TableCell>
                           <TableCell>{admin.email}</TableCell>
                           <TableCell>
-                            <Badge variant={admin.profile_id ? "default" : "secondary"}>
-                              {admin.profile_id ? "Active" : "Pending"}
+                            <Badge variant={admin.status === "active" ? "default" : "secondary"}>
+                              {admin.status === "active" ? "Active" : "Pending"}
                             </Badge>
                           </TableCell>
                           <TableCell>{formatTimestamp(admin.created_at)}</TableCell>
